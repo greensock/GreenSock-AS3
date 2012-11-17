@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.8
- * DATE: 2012-08-31
+ * VERSION: 12.0 beta 5.72
+ * DATE: 2012-11-16
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -13,7 +13,8 @@ package com.greensock {
  * other timelines, making it simple to control them as a whole and precisely manage their
  * timing. Without TimelineLite (or its big brother TimelineMax), building complex sequences
  * would be far more cumbersome because you'd need to use the <code>delay</code> special property
- * for everything which would make future edits far more tedius. Here is a basic example: 
+ * for everything which would make future edits far more tedius. Here is a basic example of a 
+ * sequence <strong>without</strong> using TimelineLite (the tedius way): 
  * <listing version="3.0">
 TweenLite.to(mc, 1, {x:100});
 TweenLite.to(mc, 1, {y:50, delay:1});
@@ -472,17 +473,22 @@ tl.to(mc, 1, {x:100})		//tween mc.x to 100
 		 * <code>baseTimeOrLabel</code> parameters. Or use a regular <code>insert()</code> like 
 		 * <code>myTimeline.insert( TweenLite.to(mc, 1, {x:100}), 2.75)</code>.</p>
 		 * 
-		 * <p>The 4th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the new
-		 * tween gets inserted (although the 5th parameter allows you to define a different
+		 * <p>The 4th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the tween gets appended there. </p>
+		 * 
+		 * <p>Also note that the 5th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
 		 * reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
 		 * there to be a 2-second gap/delay before the tween starts. An offset of -0.5 would mean 
 		 * the new tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
 		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
-		 * from which to offset, use the <code>baseTimeOrLabel</code> (5th) parameter. For example, 
+		 * from which to offset, use the <code>baseTimeOrLabel</code> parameter. For example, 
 		 * 0 would be the beginning of the timeline. So <code>myTimeline.to(mc, 1, {x:100}, 0, 0)</code> 
 		 * would insert the tween at the very beginning of the timeline and 
 		 * <code>myTimeline.to(mc, 1, {x:100}, 2, "myLabel")</code> would insert the tween 2 seconds 
@@ -501,8 +507,8 @@ tl.to(mc, 1, {x:100}, 2, "myLabel");  //places it 2 seconds after "myLabel"
 		 * @param target Target object (or array of objects) whose properties the tween affects 
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
 		 * @param vars An object defining the end value for each property that should be tweened as well as any special properties like <code>onComplete</code>, <code>ease</code>, etc. For example, to tween <code>mc.x</code> to 100 and <code>mc.y</code> to 200 and then call <code>myFunction</code>, do this: <code>myTimeline.to(mc, 1, {x:100, y:200, onComplete:myFunction})</code>.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the tween from the end of the timeline. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
-		 * @param baseTimeOrLabel By default, the tween is inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.to(mc, 1, {x:100}, 0, 0)</code> would insert the tween at the very beginning of the timeline and <code>myTimeline.to(mc, 1, {x:100}, 2, "myLabel")</code> would insert the tween 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.to(mc, 1, {x:100}, 0, myTimeline.duration())</code>).
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tween should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tween gets appended there. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param baseTimeOrLabel By default, the tween is inserted at the end of the timeline plus the <code>offsetOrLabel</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.to(mc, 1, {x:100}, 0, 0)</code> would insert the tween at the very beginning of the timeline and <code>myTimeline.to(mc, 1, {x:100}, 2, "myLabel")</code> would insert the tween 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.to(mc, 1, {x:100}, 0, myTimeline.duration())</code>).
 		 * @return self (makes chaining easier)
 		 * @see #from()
 		 * @see #fromTo()
@@ -510,8 +516,8 @@ tl.to(mc, 1, {x:100}, 2, "myLabel");  //places it 2 seconds after "myLabel"
 		 * @see #insert()
 		 * @see #remove()
 		 */
-		public function to(target:Object, duration:Number, vars:Object, offset:Number=0, baseTimeOrLabel:*=null):* {
-			return insert( new TweenLite(target, duration, vars), _parseTimeOrLabel(baseTimeOrLabel) + offset); 
+		public function to(target:Object, duration:Number, vars:Object, offsetOrLabel:*=0, baseTimeOrLabel:*=null):* {
+			return insert( new TweenLite(target, duration, vars), _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true)); 
 		}
 		
 		/**
@@ -544,11 +550,16 @@ tl.from(mc, 1, {x:-100})	//tween mc.x from -100
 		 * <code>baseTimeOrLabel</code> parameters. Or use a regular <code>insert()</code> like 
 		 * <code>myTimeline.insert( TweenLite.from(mc, 1, {x:100}), 2.75)</code>.</p>
 		 * 
-		 * <p>The 4th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the new
-		 * tween gets inserted (although the 5th parameter allows you to define a different
+		 * <p>The 4th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the tween gets appended there. </p>
+		 * 
+		 * <p>Also note that the 5th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
 		 * reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
 		 * there to be a 2-second gap/delay before the tween starts. An offset of -0.5 would mean 
 		 * the new tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
 		 * the previous tween(s) by 0.5 seconds.</p>
@@ -579,7 +590,7 @@ tl.from(mc, 1, {x:100}, 2, "myLabel");  //places it 2 seconds after "myLabel"
 		 * @param target Target object (or array of objects) whose properties the tween affects 
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
 		 * @param vars An object defining the starting value for each property that should be tweened as well as any special properties like <code>onComplete</code>, <code>ease</code>, etc. For example, to tween <code>mc.x</code> from 100 and <code>mc.y</code> from 200 and then call <code>myFunction</code>, do this: <code>myTimeline.from(mc, 1, {x:100, y:200, onComplete:myFunction});</code>
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the tween from the end of the timeline. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tween should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tween gets appended there. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the tween is inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.from(mc, 1, {x:100}, 0, 0)</code> would insert the tween at the very beginning of the timeline and <code>myTimeline.from(mc, 1, {x:100}, 2, "myLabel")</code> would insert the tween 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.from(mc, 1, {x:100}, 0, myTimeline.duration())</code>).
 		 * @return self (makes chaining easier)
 		 * @see #to()
@@ -588,8 +599,8 @@ tl.from(mc, 1, {x:100}, 2, "myLabel");  //places it 2 seconds after "myLabel"
 		 * @see #insert()
 		 * @see #remove()
 		 */
-		public function from(target:Object, duration:Number, vars:Object, offset:Number=0, baseTimeOrLabel:*=null):* {
-			return insert( TweenLite.from(target, duration, vars), _parseTimeOrLabel(baseTimeOrLabel) + offset);
+		public function from(target:Object, duration:Number, vars:Object, offsetOrLabel:*=0, baseTimeOrLabel:*=null):* {
+			return insert( TweenLite.from(target, duration, vars), _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true));
 		}
 		
 		/**
@@ -622,11 +633,16 @@ tl.fromTo(mc, 1, {x:0}, {x:-100})	//tween mc.x from 0 to -100
 		 * <code>baseTimeOrLabel</code> parameters. Or use a regular <code>insert()</code> like 
 		 * <code>myTimeline.insert( TweenLite.fromTo(mc, 1, {x:0}, {x:100}), 2.75)</code>.</p>
 		 * 
-		 * <p>The 5th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the new
-		 * tween gets inserted (although the 6th parameter allows you to define a different
+		 * <p>The 5th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the tween gets appended there. </p>
+		 * 
+		 * <p>Also note that the 6th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
 		 * reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
 		 * there to be a 2-second gap/delay before the tween starts. An offset of -0.5 would mean 
 		 * the new tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
 		 * the previous tween(s) by 0.5 seconds.</p>
@@ -652,7 +668,7 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, 2, "myLabel");  //places it 2 seconds after "my
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
 		 * @param fromVars An object defining the starting value for each property that should be tweened. For example, to tween <code>mc.x</code> from 100 and <code>mc.y</code> from 200, <code>fromVars</code> would look like this: <code>{x:100, y:200}</code>.
 		 * @param toVars An object defining the end value for each property that should be tweened as well as any special properties like <code>onComplete</code>, <code>ease</code>, etc. For example, to tween <code>mc.x</code> from 0 to 100 and <code>mc.y</code> from 0 to 200 and then call <code>myFunction</code>, do this: <code>myTimeline.fromTo(mc, 1, {x:0, y:0}, {x:100, y:200, onComplete:myFunction});</code>
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the tween from the end of the timeline. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tween should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tween gets appended there. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the tween is inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.fromTo(mc, 1, {x:0}, {x:100}, 0, 0)</code> would insert the tween at the very beginning of the timeline and <code>myTimeline.fromTo(mc, 1, {x:0}, {x:100}, 2, "myLabel")</code> would insert the tween 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.fromTo(mc, 1, {x:0}, {x:100}, 0, myTimeline.duration())</code>).
 		 * @return self (makes chaining easier)
 		 * @see #to()
@@ -661,8 +677,8 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, 2, "myLabel");  //places it 2 seconds after "my
 		 * @see #insert()
 		 * @see #remove()
 		 */
-		public function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object, offset:Number=0, baseTimeOrLabel:*=null):* {
-			return insert( TweenLite.fromTo(target, duration, fromVars, toVars), _parseTimeOrLabel(baseTimeOrLabel) + offset);
+		public function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object, offsetOrLabel:*=0, baseTimeOrLabel:*=null):* {
+			return insert( TweenLite.fromTo(target, duration, fromVars, toVars), _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true));
 		}
 		
 		/**
@@ -686,14 +702,19 @@ myTimeline.staggerTo(textFields, 1, {y:"+150", ease:CubicIn.ease}, 0.2);
 		 * sequence. This can be very useful, but if you want to call a function after the entire
 		 * sequence of tweens has completed, use the <code>onCompleteAll</code> parameter (the 7th parameter).</p>
 		 * 
-		 * <p>The 5th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the 
-		 * first staggered tween gets inserted (although the 6th parameter allows you to define a 
-		 * different reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
-		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of 
-		 * -0.5 would mean the first staggered tween gets inserted 0.5 seconds before the end of 
-		 * the timeline, so it will overlap the previous tween(s) by 0.5 seconds.</p>
+		 * <p>The 5th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point of the first tween from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the staggered tweens gets appended there. </p>
+		 * 
+		 * <p>Also note that the 6th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
+		 * reference point from which to offset, but since sequencing is so common, the default
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
+		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of -0.5 would mean 
+		 * the first staggered tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
+		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
 		 * from which to offset, use the <code>baseTimeOrLabel</code> (6th) parameter. For example, 
@@ -716,7 +737,7 @@ myTimeline.staggerTo(textFields, 1, {y:"+150", ease:CubicIn.ease}, 0.2);
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
 		 * @param vars An object defining the end value for each property that should be tweened as well as any special properties like <code>ease</code>. For example, to tween <code>x</code> to 100 and <code>y</code> to 200 for mc1, mc2, and mc3, staggering their start time by 0.25 seconds and then call <code>myFunction</code> when they last one has finished, do this: <code>myTimeline.staggerTo([mc1, mc2, mc3], 1, {x:100, y:200}, 0.25, 0, null, myFunction})</code>.
 		 * @param stagger Amount of time in seconds (or frames if the timeline is frames-based) to stagger the start time of each tween. For example, you might want to have 5 objects move down 100 pixels while fading out, and stagger the start times by 0.2 seconds - you could do: <code>myTimeline.staggerTo([mc1, mc2, mc3, mc4, mc5], 1, {y:"+100", alpha:0}, 0.2)</code>.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the first tween from the end of the timeline. For example, to append the first tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tweens should start being inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tweens get appended there. For example, to start appending the tweens 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tweens appended so that they overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the tweens are inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.staggerTo([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 0, 0)</code> would insert the tweens beginning at the very start of the timeline and <code>myTimeline.staggerTo([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 3, "myLabel")</code> would insert the tweens beginning 3 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.staggerTo([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 0, myTimeline.duration())</code>).
 		 * @param onCompleteAll A function to call as soon as the entire sequence of tweens has completed
 		 * @param onCompleteAllParams An array of parameters to pass the <code>onCompleteAll</code> method.
@@ -724,7 +745,7 @@ myTimeline.staggerTo(textFields, 1, {y:"+150", ease:CubicIn.ease}, 0.2);
 		 * @see #staggerFrom()
 		 * @see #staggerFromTo()
 		 */
-		public function staggerTo(targets:Array, duration:Number, vars:Object, stagger:Number, offset:Number=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
+		public function staggerTo(targets:Array, duration:Number, vars:Object, stagger:Number, offsetOrLabel:*=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
 			var tl:TimelineLite = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams});
 			for (var i:int = 0; i < targets.length; i++) {
 				if (vars.startAt != null) {
@@ -732,7 +753,7 @@ myTimeline.staggerTo(textFields, 1, {y:"+150", ease:CubicIn.ease}, 0.2);
 				}
 				tl.insert( new TweenLite(targets[i], duration, _copy(vars)), i * stagger);
 			}
-			return insert(tl, _parseTimeOrLabel(baseTimeOrLabel) + offset);
+			return insert(tl, _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true));
 		}
 		
 		/**
@@ -757,14 +778,19 @@ myTimeline.staggerFrom(textFields, 1, {y:"+150"}, 0.2);
 		 * sequence. This can be very useful, but if you want to call a function after the entire
 		 * sequence of tweens has completed, use the <code>onCompleteAll</code> parameter (the 7th parameter).</p>
 		 * 
-		 * <p>The 5th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the 
-		 * first staggered tween gets inserted (although the 6th parameter allows you to define a 
-		 * different reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
-		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of 
-		 * -0.5 would mean the first staggered tween gets inserted 0.5 seconds before the end of 
-		 * the timeline, so it will overlap the previous tween(s) by 0.5 seconds.</p>
+		 * <p>The 5th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point of the first tween from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the staggered tweens gets appended there. </p>
+		 * 
+		 * <p>Also note that the 6th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
+		 * reference point from which to offset, but since sequencing is so common, the default
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
+		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of -0.5 would mean 
+		 * the first staggered tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
+		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
 		 * from which to offset, use the <code>baseTimeOrLabel</code> (6th) parameter. For example, 
@@ -793,7 +819,7 @@ myTimeline.staggerFrom(textFields, 1, {y:"+150"}, 0.2);
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
 		 * @param vars An object defining the beginning value for each property that should be tweened as well as any special properties like <code>ease</code>. For example, to tween <code>x</code> from 100 and <code>y</code> from 200 for mc1, mc2, and mc3, staggering their start time by 0.25 seconds and then call <code>myFunction</code> when they last one has finished, do this: <code>myTimeline.staggerFrom([mc1, mc2, mc3], 1, {x:100, y:200}, 0.25, 0, null, myFunction})</code>.
 		 * @param stagger Amount of time in seconds (or frames if the timeline is frames-based) to stagger the start time of each tween. For example, you might want to have 5 objects move down 100 pixels while fading out, and stagger the start times by 0.2 seconds - you could do: <code>myTimeline.staggerTo([mc1, mc2, mc3, mc4, mc5], 1, {y:"+100", alpha:0}, 0.2)</code>.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the first tween from the end of the timeline. For example, to append the first tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tweens should start being inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tweens get appended there. For example, to start appending the tweens 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tweens appended so that they overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the tweens are inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.staggerFrom([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 0, 0)</code> would insert the tweens beginning at the very start of the timeline and <code>myTimeline.staggerFrom([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 3, "myLabel")</code> would insert the tweens beginning 3 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.staggerFrom([mc1, mc2, mc3], 1, {x:"+=100"}, 0.2, 0, myTimeline.duration())</code>).
 		 * @param onCompleteAll A function to call as soon as the entire sequence of tweens has completed
 		 * @param onCompleteAllParams An array of parameters to pass the <code>onCompleteAll</code> method.
@@ -801,13 +827,13 @@ myTimeline.staggerFrom(textFields, 1, {y:"+150"}, 0.2);
 		 * @see #staggerTo()
 		 * @see #staggerFromTo()
 		 */
-		public function staggerFrom(targets:Array, duration:Number, vars:Object, stagger:Number=0, offset:Number=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
+		public function staggerFrom(targets:Array, duration:Number, vars:Object, stagger:Number=0, offsetOrLabel:*=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
 			vars = _prepVars(vars);
 			if (!("immediateRender" in vars)) {
 				vars.immediateRender = true;
 			}
 			vars.runBackwards = true;
-			return staggerTo(targets, duration, vars, stagger, offset, baseTimeOrLabel, onCompleteAll, onCompleteAllParams);
+			return staggerTo(targets, duration, vars, stagger, offsetOrLabel, baseTimeOrLabel, onCompleteAll, onCompleteAllParams);
 		}
 		
 		/**
@@ -831,14 +857,19 @@ myTimeline.staggerFromTo(textFields, 1, {alpha:1}, {alpha:0}, 0.2);
 		 * sequence. This can be very useful, but if you want to call a function after the entire
 		 * sequence of tweens has completed, use the <code>onCompleteAll</code> parameter (the 8th parameter).</p>
 		 * 
-		 * <p>The 6th parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the 
-		 * first staggered tween gets inserted (although the 7th parameter allows you to define a 
-		 * different reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
-		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of 
-		 * -0.5 would mean the first staggered tween gets inserted 0.5 seconds before the end of 
-		 * the timeline, so it will overlap the previous tween(s) by 0.5 seconds.</p>
+		 * <p>The 6th parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point of the first tween from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the tween should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the staggered tweens gets appended there. </p>
+		 * 
+		 * <p>Also note that the 7th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
+		 * reference point from which to offset, but since sequencing is so common, the default
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
+		 * there to be a 2-second gap/delay before the first staggered tween starts. An offset of -0.5 would mean 
+		 * the first staggered tween gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
+		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
 		 * from which to offset, use the <code>baseTimeOrLabel</code> (7th) parameter. For example, 
@@ -862,7 +893,7 @@ myTimeline.staggerFromTo(textFields, 1, {alpha:1}, {alpha:0}, 0.2);
 		 * @param fromVars An object defining the starting value for each property that should be tweened. For example, to tween <code>x</code> from 100 and <code>y</code> from 200, <code>fromVars</code> would look like this: <code>{x:100, y:200}</code>.
 		 * @param toVars An object defining the end value for each property that should be tweened as well as any special properties like <code>ease</code>. For example, to tween <code>x</code> from 0 to 100 and <code>y</code> from 0 to 200, staggering the start times by 0.2 seconds and then call <code>myFunction</code> when they all complete, do this: <code>myTimeline.staggerFromTo([mc1, mc2, mc3], 1, {x:0, y:0}, {x:100, y:200}, 0.2, 0, null, myFunction});</code>
 		 * @param stagger Amount of time in seconds (or frames if the timeline is frames-based) to stagger the start time of each tween. For example, you might want to have 5 objects move down 100 pixels while fading out, and stagger the start times by 0.2 seconds - you could do: <code>myTimeline.staggerTo([mc1, mc2, mc3, mc4, mc5], 1, {y:"+100", alpha:0}, 0.2)</code>.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the first tween from the end of the timeline. For example, to append the first tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tweens should start being inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tweens get appended there. For example, to start appending the tweens 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tweens appended so that they overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the tweens are inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.staggerFromTo([mc1, mc2, mc3], 1, {x:0}, {x:100}, 0.2, 0, 0)</code> would insert the tweens beginning at the very start of the timeline and <code>myTimeline.staggerFromTo([mc1, mc2, mc3], 1, {x:0}, {x:100}, 0.2, 3, "myLabel")</code> would insert the tweens beginning 3 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.staggerFromTo([mc1, mc2, mc3], 1, {x:0}, {x:100}, 0.2, 0, myTimeline.duration())</code>).
 		 * @param onCompleteAll A function to call as soon as the entire sequence of tweens has completed
 		 * @param onCompleteAllParams An array of parameters to pass the <code>onCompleteAll</code> method.
@@ -870,14 +901,14 @@ myTimeline.staggerFromTo(textFields, 1, {alpha:1}, {alpha:0}, 0.2);
 		 * @see #staggerTo()
 		 * @see #staggerFrom()
 		 */
-		public function staggerFromTo(targets:Array, duration:Number, fromVars:Object, toVars:Object, stagger:Number=0, offset:Number=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
+		public function staggerFromTo(targets:Array, duration:Number, fromVars:Object, toVars:Object, stagger:Number=0, offsetOrLabel:*=0, baseTimeOrLabel:*=null, onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
 			toVars = _prepVars(toVars);
 			fromVars = _prepVars(fromVars);
 			toVars.startAt = fromVars;
 			if (fromVars.immediateRender) {
 				toVars.immediateRender = true;
 			}
-			return staggerTo(targets, duration, toVars, stagger, offset, baseTimeOrLabel, onCompleteAll, onCompleteAllParams);
+			return staggerTo(targets, duration, toVars, stagger, offsetOrLabel, baseTimeOrLabel, onCompleteAll, onCompleteAllParams);
 		}
 		
 		/**
@@ -915,14 +946,19 @@ tl.to(mc, 1, {x:100})	//tween mc.x to 100
   .staggerTo([mc1, mc2, mc3], 1.5, {rotation:45}, 0.25); //finally tween the rotation of mc1, mc2, and mc3 to 45 and stagger the start times by 0.25 seconds
 </listing>
 		 * 
-		 * <p>The 3rd parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the
-		 * callback gets inserted (although the 4th parameter allows you to define a different
+		 * <p>The 3rd parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the callback should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the callback gets appended there. </p>
+		 * 
+		 * <p>Also note that the 4th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
 		 * reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
-		 * there to be a 2-second gap/delay before the callback. An offset of -0.5 would mean 
-		 * the callback gets inserted 0.5 seconds before the end of the timeline, so it will 
-		 * overlap the previous tween(s) by 0.5 seconds.</p>
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
+		 * there to be a 2-second gap/delay before the callback is triggered. An offset of -0.5 would mean 
+		 * the new callback gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
+		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
 		 * from which to offset, use the <code>baseTimeOrLabel</code> (4th) parameter. For example, 
@@ -944,20 +980,19 @@ tl.call(myFunction, [mc], 2, "myLabel");  //places it 2 seconds after "myLabel"
 		 * <p><strong>JavaScript and AS2 note:</strong> - Due to the way JavaScript and AS2 don't 
 		 * maintain scope (what "<code>this</code>" refers to, or the context) in function calls, 
 		 * it can be useful to define the scope specifically. Therefore, in the JavaScript and AS2 
-		 * versions the 3rd parameter is <code>scope</code>, bumping <code>offset</code> 
-		 * back to the 4th parameter, and <code>baseTimeOrLabel</code> to 5th.</p>
+		 * versions the 3rd parameter is <code>scope</code>, but that parameter is omitted in the AS3 version.</p>
 		 * 
 		 * @param callback Function to call
 		 * @param params An Array of parameters to pass the function.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the callback from the end of the timeline. For example, to append the callback 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the callback appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the callback should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the callback gets appended there. For example, to append a callback 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the callback appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the callback is inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.call(myFunction, null, 0, 0)</code> would insert the callback at the very beginning of the timeline and <code>myTimeline.call(myFunction, null, 2, "myLabel")</code> would insert the callback 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.call(myFunction, null, 0, myTimeline.duration())</code>).
 		 * @return self (makes chaining easier)
 		 * @see #append()
 		 * @see #insert()
 		 * @see #remove()
 		 */
-		public function call(callback:Function, params:Array=null, offset:Number=0, baseTimeOrLabel:*=null):* {
-			return insert( TweenLite.delayedCall(0, callback, params), _parseTimeOrLabel(baseTimeOrLabel) + offset);
+		public function call(callback:Function, params:Array=null, offsetOrLabel:*=0, baseTimeOrLabel:*=null):* {
+			return insert( TweenLite.delayedCall(0, callback, params), _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true));
 		}
 		
 		/**
@@ -986,14 +1021,19 @@ tl.to(mc, 1, {x:100})	//tween mc.x to 100
   .call(otherFunction)	//then call otherFunction()
   .staggerTo([mc1, mc2, mc3], 1.5, {rotation:45}, 0.25); //finally tween the rotation of mc1, mc2, and mc3 to 45 and stagger the start times by 0.25 seconds
 </listing>
-		 * <p>The 3rd parameter is the <code>offset</code> which can be positive or negative
-		 * and it essentially controls the gap between the end of the timeline and where the
-		 * zero-duration tween gets inserted (although the 4th parameter allows you to define a different
+		 * <p>The 3rd parameter is the <code>offsetOrLabel</code> which can be either a number
+		 * indicating how many seconds (or frames for frames-based timelines) to offset the insertion 
+		 * point from the end of the timeline (positive values create a gap, negative values 
+		 * create an overlap) or a string indicating the label at which the set() should be inserted. 
+		 * If you define a label that doesn't exist yet, it will automatically be added to the end 
+		 * of the timeline before the set() gets appended there. </p>
+		 * 
+		 * <p>Also note that the 4th parameter (<code>baseTimeOrLabel</code>) allows you to define a different
 		 * reference point from which to offset, but since sequencing is so common, the default
-		 * reference point is the end of the timeline). For example, an offset of 2 would cause 
-		 * there to be a 2-second gap/delay before the tween. An offset of -0.5 would mean 
-		 * the tween gets inserted 0.5 seconds before the end of the timeline, so it will 
-		 * overlap the previous tween(s) by 0.5 seconds.</p>
+		 * reference point is the <strong>end</strong> of the timeline). For example, an offset of 2 would cause 
+		 * there to be a 2-second gap/delay before the set() runs. An offset of -0.5 would mean 
+		 * the new set() gets inserted 0.5 seconds before the end of the timeline, so it will overlap 
+		 * the previous tween(s) by 0.5 seconds.</p>
 		 * 
 		 * <p>If you prefer to define a specific time or label to serve as the reference point
 		 * from which to offset, use the <code>baseTimeOrLabel</code> (4th) parameter. For example, 
@@ -1007,7 +1047,7 @@ tl.to(mc, 1, {x:100})	//tween mc.x to 100
 		 * 
 		 * @param target Target object (or array of objects) whose properties will be set. 
 		 * @param vars An object defining the value to which each property should be set. For example, to set <code>mc.x</code> to 100 and <code>mc.y</code> to 200, do this: <code>myTimeline.set(mc, {x:100, y:200});</code>
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point of the zero-duration tween from the end of the timeline. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the zero-duration tween should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the zero-duration tween gets appended there. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the zero-duration tween appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param baseTimeOrLabel By default, the zero-duration tween is inserted at the end of the timeline plus the <code>offset</code> (which is 0 by default), but you can define a specific time or label to serve as the reference point using <code>baseTimeOrLabel</code>. For example, 0 would be the beginning of the timeline. So <code>myTimeline.set(obj, {x:100, y:0}, 0, 0)</code> would insert the tween at the very beginning of the timeline and <code>myTimeline.set(obj, {x:100, y:0}, 2, "myLabel")</code> would insert the tween 2 seconds after the "myLabel" label. Again, the default is the <strong>end</strong> of the timeline (for easy sequencing) which is the same as using the timeline's <code>duration()</code> (i.e. <code>myTimeline.set(obj, {x:100, y:0}, 0, myTimeline.duration())</code>).
 		 * @return self (makes chaining easier)
 		 * @see #to()
@@ -1015,9 +1055,9 @@ tl.to(mc, 1, {x:100})	//tween mc.x to 100
 		 * @see #insert()
 		 * @see #remove()
 		 */
-		public function set(target:Object, vars:Object, offset:Number=0, baseTimeOrLabel:*=null):* {
+		public function set(target:Object, vars:Object, offsetOrLabel:*=0, baseTimeOrLabel:*=null):* {
 			vars.immediateRender = false;
-			return insert( new TweenLite(target, 0, vars), _parseTimeOrLabel(baseTimeOrLabel) + offset);
+			return insert( new TweenLite(target, 0, vars), _parseTimeOrLabel(baseTimeOrLabel, offsetOrLabel, true));
 		}
 		
 		/** @private **/
@@ -1132,7 +1172,7 @@ TweenLite.fromTo(myWindow, 1, {scaleX:0, scaleY:0}, {scaleX:1, scaleY:1});
 			} else if (value is Array) {
 				return insertMultiple(value, timeOrLabel);
 			} else if (typeof(value) == "string") {
-				return addLabel(String(value), _parseTimeOrLabel(timeOrLabel || 0, true));
+				return addLabel(String(value), _parseTimeOrLabel(timeOrLabel || 0, 0, true));
 			} else if (typeof(value) == "function") {
 				value = TweenLite.delayedCall(0, value);
 			} else {
@@ -1140,7 +1180,7 @@ TweenLite.fromTo(myWindow, 1, {scaleX:0, scaleY:0}, {scaleX:1, scaleY:1});
 				return this;
 			}
 			
-			super.insert(value, _parseTimeOrLabel(timeOrLabel || 0, true));
+			super.insert(value, _parseTimeOrLabel(timeOrLabel || 0, 0, true));
 			
 			//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly.  
 			if (_gc) if (!_paused) if (_time == _duration) if (_time < duration()) {
@@ -1192,6 +1232,12 @@ TweenLite.fromTo(myWindow, 1, {scaleX:0, scaleY:0}, {scaleX:1, scaleY:1});
 		 * <p>To insert the tween/timeline/callback/label at a specific position on the timeline 
 		 * rather than appending it to the end, use the <code>insert()</code> method.</p>
 		 * 
+		 * <p>If you define a label (string) as the <code>offsetOrLabel</code> parameter, 
+		 * the tween/timeline/callback will be inserted wherever that label is, but if the
+		 * label doesn't exist yet, it will be added to the end of the timeline first and
+		 * then the tween/timeline/callback will be inserted there. This makes it easier
+		 * to build things as you go with concise code, adding labels as things get appended.</p>
+		 * 
 		 * <listing version="3.0">
 //append a tween
 myTimeline.append(TweenLite.to(mc, 1, {x:100}));
@@ -1211,7 +1257,7 @@ myTimeline.append(nested);
 </listing>
 		 * 
 		 * @param value The tween, timeline, callback, or label to append. You can even pass in an array of them.
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline. For example, to append 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have it appended so that it overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tween/timeline/callback should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tween/timeline/callback gets appended there. For example, to append a tween 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to have the tween appended so that it overlaps with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @return self (makes chaining easier)
 		 * @see #insert()
 		 * @see #to()
@@ -1222,8 +1268,8 @@ myTimeline.append(nested);
 		 * @see #appendMultiple()
 		 * @see #insertMultiple()
 		 */
-		public function append(value:*, offset:Number=0):* {
-			return insert(value, duration() + offset);
+		public function append(value:*, offsetOrLabel:*=0):* {
+			return insert(value, _parseTimeOrLabel(null, offsetOrLabel, true));
 		}
 		
 		/**
@@ -1244,7 +1290,7 @@ myTimeline.append(nested);
 		 * @see #staggerFromTo()
 		 */
 		public function insertMultiple(tweens:Array, timeOrLabel:*=0, align:String="normal", stagger:Number=0):* {
-			var i:int, tween:*, curTime:Number = _parseTimeOrLabel(timeOrLabel || 0, true), l:Number = tweens.length;
+			var i:int, tween:*, curTime:Number = _parseTimeOrLabel(timeOrLabel || 0, 0, true), l:Number = tweens.length;
 			for (i = 0; i < l; i++) {
 				if ((tween = tweens[i]) is Array) {
 					tween = new TimelineLite({tweens:tween});
@@ -1271,13 +1317,13 @@ myTimeline.append(nested);
 		 * a sequence of evenly-spaced tweens.
 		 *  
 		 * @param tweens An array containing the tweens, timelines, callbacks, and/or labels that should be appended  
-		 * @param offset Amount of seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline. For example, to start appending 3 seconds after the end of the timeline (leaving a 3-second gap), set the offset to 3. Or to have things appended so that the initial insertion point overlaps with the last 2 seconds of the timeline, set the offset to -2. The default is 0 so that the insertion point is exactly at the end of the timeline. 
+		 * @param offsetOrLabel Either a number indicating how many seconds (or frames for frames-based timelines) to offset the insertion point from the end of the timeline (positive values create a gap, negative values create an overlap) or a string indicating the label at which the tween should be inserted. If you define a label that doesn't exist yet, it will automatically be added to the end of the timeline before the tweens/timelines/callbacks gets appended there. For example, to begin appending the tweens 3 seconds after the end of the timeline (leaving a 3-second gap), set the offsetOrLabel to 3. Or to begin appending the tweens/timelines/callbacks so that they overlap with the last 2 seconds of the timeline, set the offsetOrLabel to -2. The default is 0 so that the insertion point is exactly at the end of the timeline.
 		 * @param align Determines how the objects will be aligned in relation to each other before getting appended. Options are: TweenAlign.SEQUENCE (aligns the tweens one-after-the-other in a sequence), TweenAlign.START (aligns the start times of all of the tweens (ignores delays)), and TweenAlign.NORMAL (aligns the start times of all the tweens (honors delays)). The default is NORMAL.
 		 * @param stagger Staggers the tweens by a set amount of time (in seconds) (or in frames for frames-based timelines). For example, if the stagger value is 0.5 and the <code>"align"</code> parameter is set to <code>"start"</code>, the second one will start 0.5 seconds after the first one starts, then 0.5 seconds later the third one will start, etc. If the align property is <code>"sequence"</code>, there would be 0.5 seconds added between each tween. Default is 0.
 		 * @return The array of tweens that were appended
 		 */
-		public function appendMultiple(tweens:Array, offset:Number=0, align:String="normal", stagger:Number=0):* {
-			return insertMultiple(tweens, duration() + offset, align, stagger);
+		public function appendMultiple(tweens:Array, offsetOrLabel:*=0, align:String="normal", stagger:Number=0):* {
+			return insertMultiple(tweens, _parseTimeOrLabel(null, offsetOrLabel, true), align, stagger);
 		}
 		
 		/**
@@ -1318,16 +1364,20 @@ myTimeline.append(nested);
 		}
 		
 		/** @private **/
-		protected function _parseTimeOrLabel(timeOrLabel:*, appendIfAbsent:Boolean=false):Number {
-			if (timeOrLabel == null) {
-				return duration();
-			} else if (typeof(timeOrLabel) == "string") {
-				if (!(timeOrLabel in _labels)) {
-					return (appendIfAbsent) ? (_labels[timeOrLabel] = duration()) : 0;
-				}
-				return _labels[timeOrLabel];
+		protected function _parseTimeOrLabel(timeOrLabel:*, offsetOrLabel:*=0, appendIfAbsent:Boolean=false):Number {
+			if (typeof(offsetOrLabel) === "string") {
+				return _parseTimeOrLabel(offsetOrLabel, (appendIfAbsent && typeof(timeOrLabel) === "number" && !(offsetOrLabel in _labels)) ? timeOrLabel - duration() : 0, appendIfAbsent);
 			}
-			return Number(timeOrLabel);
+			offsetOrLabel = offsetOrLabel || 0;
+			if (timeOrLabel == null) {
+				return duration() + offsetOrLabel;
+			} else if (typeof(timeOrLabel) === "string") {
+				if (!(timeOrLabel in _labels)) {
+					return (appendIfAbsent) ? (_labels[timeOrLabel] = duration() + offsetOrLabel) : offsetOrLabel;
+				}
+				return _labels[timeOrLabel] + offsetOrLabel;
+			}
+			return Number(timeOrLabel) + offsetOrLabel;
 		}
 		
 		/**
@@ -1362,7 +1412,7 @@ myAnimation.seek("myLabel");
 		 * @see #pause()
 		 */
 		override public function seek(timeOrLabel:*, suppressEvents:Boolean=true):* {
-			return totalTime(_parseTimeOrLabel(timeOrLabel, false), suppressEvents);
+			return totalTime(_parseTimeOrLabel(timeOrLabel, 0, false), suppressEvents);
 		}
 		
 		/** [deprecated] Pauses the timeline (used for consistency with Flash's MovieClip.stop() functionality, but essentially accomplishes the same thing as <code>pause()</code> without the parameter) @return self (makes chaining easier) **/

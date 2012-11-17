@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.71
- * DATE: 2012-09-17
+ * VERSION: 12.0 beta 5.72
+ * DATE: 2012-11-16
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -955,6 +955,9 @@ tween.updateTo({x:300, y:0}, false);
 			}
 			
 			if (prevTime == _time && !force) {
+				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
+					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
+				}
 				return;
 			} else if (!_initted) {
 				_init();
@@ -1713,7 +1716,7 @@ myTween.progress( 0.25 ); //sets progress to one quarter finished
 		 * @see #totalTime()
 		 **/
 		public function progress(value:Number=NaN):* {
-			return (!arguments.length) ? _time / duration() : totalTime( duration() * value + (_cycle * _duration), false);
+			return (!arguments.length) ? _time / duration() : totalTime( duration() * ((_yoyo && (_cycle & 1) !== 0) ? 1 - value : value) + (_cycle * (_duration + _repeatDelay)), false);
 		}
 		
 		/** 

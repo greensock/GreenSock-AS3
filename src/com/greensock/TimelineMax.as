@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0 beta 5.2
- * DATE: 2012-05-01
+ * VERSION: 12.0 beta 5.72
+ * DATE: 2012-11-16
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -656,7 +656,7 @@ tl.append(nested);
 			} else {
 				var a:Array = getTweensOf(callback, false),
 					i:int = a.length,
-					time:Number = _parseTimeOrLabel(timeOrLabel, false);
+					time:Number = _parseTimeOrLabel(timeOrLabel);
 				while (--i > -1) {
 					if (a[i]._startTime === time) {
 						a[i]._enabled(false, false);
@@ -710,7 +710,7 @@ tl.append(nested);
 			for (var p:String in vars) {
 				copy[p] = vars[p];
 			}
-			copy.time = _parseTimeOrLabel(timeOrLabel, false);
+			copy.time = _parseTimeOrLabel(timeOrLabel);
 			var t:TweenLite = new TweenLite(this, (Math.abs(Number(copy.time) - _time) / _timeScale) || 0.001, copy);
 			copy.onStart = function():void {
 				t.target.paused(true);
@@ -769,7 +769,7 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 		 */
 		public function tweenFromTo(fromTimeOrLabel:*, toTimeOrLabel:*, vars:Object=null):TweenLite {
 			vars = vars || {};
-			vars.startAt = {time:_parseTimeOrLabel(fromTimeOrLabel, false)};
+			vars.startAt = {time:_parseTimeOrLabel(fromTimeOrLabel)};
 			var t:TweenLite = tweenTo(toTimeOrLabel, vars);
 			return t.duration((Math.abs( t.vars.time - t.vars.startAt.time) / _timeScale) || 0.001) as TweenLite;
 		}
@@ -805,10 +805,10 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 				_rawPrevTime = time;
 				if (_yoyo && (_cycle & 1) != 0) {
 					_time = 0;
-					time = -0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+					time = -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				} else {
 					_time = _duration;
-					time = _duration + 0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+					time = _duration + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				}
 				
 			} else if (time <= 0) {
@@ -816,7 +816,7 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 					_totalTime = _cycle = 0;
 				}
 				_time = 0;
-				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0)) {
+				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0 && !_locked)) {
 					callback = "onReverseComplete";
 					isComplete = _reversed;
 				}
@@ -829,7 +829,7 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 					force = true;
 				}
 				_rawPrevTime = time;
-				time = -0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = (_duration == 0) ? 0 : -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else {
 				_time = _rawPrevTime = time;
@@ -847,10 +847,9 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 						}
 						if (_time > _duration) {
 							_time = _duration;
-							time = _duration + 0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+							time = _duration + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 						} else if (_time < 0) {
-							_time = 0;
-							time = -0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+							_time = time = 0;
 						} else {
 							time = _time;
 						}
@@ -907,6 +906,9 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 			}
 			
 			if (_time == prevTime && !force) {
+				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
+					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
+				}
 				return;
 			} else if (!_initted) {
 				_initted = true;
@@ -1215,7 +1217,7 @@ myTimeline.progress( 0.25 ); //sets progress to one quarter finished
 		 * @see #totalTime()
 		 **/
 		override public function progress(value:Number=NaN):* {
-			return (!arguments.length) ? _time / duration() : totalTime( duration() * value + (_cycle * _duration), false);
+			return (!arguments.length) ? _time / duration() : totalTime( duration() * ((_yoyo && (_cycle & 1) !== 0) ? 1 - value : value) + (_cycle * (_duration + _repeatDelay)), false);
 		}
 		
 		/** 

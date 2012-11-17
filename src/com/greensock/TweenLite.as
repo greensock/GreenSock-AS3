@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.7
- * DATE: 2012-08-24
+ * VERSION: 12.0 beta 5.72
+ * DATE: 2012-11-16
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -570,7 +570,7 @@ package com.greensock {
 				} else {
 					_firstPT = propLookup[p] = new PropTween(target, p, 0, 1, p, false, _firstPT);
 					_firstPT.s = (!_firstPT.f) ? Number(target[p]) : target[ ((p.indexOf("set") || !("get" + p.substr(3) in target)) ? p : "get" + p.substr(3)) ]();
-					_firstPT.c = (typeof(vars[p]) === "number") ? Number(vars[p]) - _firstPT.s : (typeof(vars[p]) === "string" && vars[p].charAt(1) === "=") ? int(vars[p].charAt(0)+"1") * Number(vars[p].substr(2)) : Number(vars[p]) || 0;
+					_firstPT.c = (typeof(vars[p]) === "number") ? Number(vars[p]) - _firstPT.s : (typeof(vars[p]) === "string" && vars[p].charAt(1) === "=") ? int(vars[p].charAt(0)+"1") * Number(vars[p].substr(2)) : Number(vars[p]) || 0;				
 				}
 			}
 			
@@ -1195,17 +1195,17 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 				return changed;
 			}
 			//NOTE: Add 0.0000000001 to overcome floating point errors that can cause the startTime to be VERY slightly off (when a tween's time() is set for example)
-			var startTime:Number = tween._startTime + 0.0000000001, overlaps:Array = [], oCount:int = 0, globalStart:Number;
+			var startTime:Number = tween._startTime + 0.0000000001, overlaps:Array = [], oCount:int = 0, zeroDur:Boolean = (tween._duration == 0), globalStart:Number;
 			i = siblings.length;
 			while (--i > -1) {
 				if ((curTween = siblings[i]) === tween || curTween._gc || curTween._paused) {
 					//ignore
 				} else if (curTween._timeline != tween._timeline) {
-					globalStart = globalStart || _checkOverlap(tween, 0);
-					if (_checkOverlap(curTween, globalStart) === 0) {
+					globalStart = globalStart || _checkOverlap(tween, 0, zeroDur);
+					if (_checkOverlap(curTween, globalStart, zeroDur) === 0) {
 						overlaps[oCount++] = curTween;
 					}
-				} else if (curTween._startTime <= startTime) if (curTween._startTime + curTween.totalDuration() / curTween._timeScale + 0.0000000001 > startTime) if (!((tween._duration == 0 || !curTween._initted) && startTime - curTween._startTime <= 0.0000000002)) {
+				} else if (curTween._startTime <= startTime) if (curTween._startTime + curTween.totalDuration() / curTween._timeScale + 0.0000000001 > startTime) if (!((zeroDur || !curTween._initted) && startTime - curTween._startTime <= 0.0000000002)) {
 					overlaps[oCount++] = curTween;
 				}
 			}
@@ -1234,7 +1234,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 		 * is true. If not, 0.0000000001 is returned, indicating that the tween shouldn't be overwritten. If any of the child's anscestor timelines
 		 * are paused, -100 is returned. This wraps a lot of functionality into a relatively concise method (keeps file size low and performance high)
 		 **/
-		private static function _checkOverlap(tween:Animation, reference:Number):Number {
+		private static function _checkOverlap(tween:Animation, reference:Number, zeroDur:Boolean):Number {
 			var tl:SimpleTimeline = tween._timeline, ts:Number = tl._timeScale, t:Number = tween._startTime;
 			while (tl._timeline) {
 				t += tl._startTime;
@@ -1245,7 +1245,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 				tl = tl._timeline;
 			}
 			t /= ts;
-			return (t > reference) ? t - reference : (!tween._initted && t - reference < 0.0000000002) ? 0.0000000001 : ((t = t + tween.totalDuration() / tween._timeScale / ts) > reference) ? 0 : t - reference - 0.0000000001;
+			return (t > reference) ? t - reference : ((zeroDur && t == reference) || (!tween._initted && t - reference < 0.0000000002)) ? 0.0000000001 : ((t = t + tween.totalDuration() / tween._timeScale / ts) > reference) ? 0 : t - reference - 0.0000000001;
 		}
 		
 		
