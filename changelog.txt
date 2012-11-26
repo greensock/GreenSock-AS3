@@ -1,6 +1,15 @@
 CHANGE LOG : GREENSOCK TWEENING PLATFORM
 ----------------------------------------
 
+2012-11-26
+---------------------------------------------
+	- Removed requirement that the target of a Physics2DPlugin tween be a DisplayObject (so Starling can work)
+	- Fixed minor bugs in TimelineLite and TimelineMax 
+
+2012-10-26
+---------------------------------------------
+	- Added functionality to append() and all convenience methods of TimelineLite/Max so that the "offset" parameter can now be a string to indicate a label. If the label isn't found, one will be created and appended to the timeline for convenience. 
+
 2012-09-17
 ---------------------------------------------
 	- Fixed issue that caused TweenMax.killAll() to kill the tweens in the reverse order that they were created.

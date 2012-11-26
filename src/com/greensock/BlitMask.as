@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.6
- * DATE: 2012-01-20
+ * VERSION: 0.61
+ * DATE: 2012-10-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -84,7 +84,7 @@ package com.greensock {
  **/
 	public class BlitMask extends Sprite {
 		/** @private **/
-		public static var version:Number = 0.6;
+		public static var version:Number = 0.61;
 		
 		// In order to conserve memory and improve performance, we create a few instances of Rectangles, Sprites, Points, Matrices, and Arrays and reuse them rather than creating new instances over and over.
 		/** @private **/
@@ -102,7 +102,7 @@ package com.greensock {
 		/** @private **/
 		protected static var _colorTransform:ColorTransform = new ColorTransform();
 		/** @private **/
-		protected static var _mouseEvents:Array = [MouseEvent.CLICK, MouseEvent.DOUBLE_CLICK, MouseEvent.MOUSE_DOWN, MouseEvent.MOUSE_MOVE, MouseEvent.MOUSE_OUT, MouseEvent.MOUSE_OVER, MouseEvent.MOUSE_UP, MouseEvent.MOUSE_WHEEL, MouseEvent.ROLL_OUT, MouseEvent.ROLL_OVER];
+		protected static var _mouseEvents:Array = [MouseEvent.CLICK, MouseEvent.DOUBLE_CLICK, MouseEvent.MOUSE_DOWN, MouseEvent.MOUSE_MOVE, MouseEvent.MOUSE_OUT, MouseEvent.MOUSE_OVER, MouseEvent.MOUSE_UP, MouseEvent.MOUSE_WHEEL, MouseEvent.ROLL_OUT, MouseEvent.ROLL_OVER, "gesturePressAndTap", "gesturePan", "gestureRotate", "gestureSwipe", "gestureZoom", "gestureTwoFingerTap", "touchBegin", "touchEnd", "touchMove", "touchOut", "touchOver", "touchRollOut", "touchRollOver", "touchTap"];
 		
 		/** @private **/
 		protected var _target:DisplayObject;

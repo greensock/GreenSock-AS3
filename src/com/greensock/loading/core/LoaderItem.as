@@ -1,13 +1,13 @@
 /**
- * VERSION: 1.92
- * DATE: 2012-08-08
+ * VERSION: 1.921
+ * DATE: 2012-10-10
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
 package com.greensock.loading.core {
 	import com.greensock.events.LoaderEvent;
-	import com.greensock.loading.LoaderStatus;
 	import com.greensock.loading.LoaderMax;
+	import com.greensock.loading.LoaderStatus;
 	
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
@@ -84,7 +84,7 @@ package com.greensock.loading.core {
 				extraParams += (extraParams == "") ? a[1] : "&" + a[1];
 			}
 			if (extraParams != "") {
-				var data:URLVariables = (request.data is URLVariables) ? request.data as URLVariables : new URLVariables();
+				var data:URLVariables = new URLVariables( ((request.data is URLVariables) ? request.data.toString() : null) );
 				a = extraParams.split("&");
 				i = a.length;
 				var pair:Array;

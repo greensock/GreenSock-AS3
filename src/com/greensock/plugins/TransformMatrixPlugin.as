@@ -13,24 +13,22 @@ package com.greensock.plugins {
  * (<code>a, b, c, d, tx, and ty</code>) or use common properties like <code>x, y, scaleX, scaleY, 
  * skewX, skewY, rotation</code> and even <code>shortRotation</code>.
  * To skew without adjusting scale visually, use skewX2 and skewY2 instead of skewX and skewY. 
- * <br /><br />
  * 
- * transformMatrix tween will affect all of the DisplayObject's transform properties, so do not use
- * it in conjunction with regular x/y/scaleX/scaleY/rotation tweens concurrently.<br /><br />
+ * <p>transformMatrix tween will affect all of the DisplayObject's transform properties, so do not use
+ * it in conjunction with regular x/y/scaleX/scaleY/rotation tweens concurrently.</p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.~~; <br />
- * 		TweenPlugin.activate([TransformMatrixPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
- * 
- * 		TweenLite.to(mc, 1, {transformMatrix:{x:50, y:300, scaleX:2, scaleY:2}}); <br /><br />
- * 		
- * 		//-OR-<br /><br />
- * 
- * 		TweenLite.to(mc, 1, {transformMatrix:{tx:50, ty:300, a:2, d:2}}); <br /><br />
- * 
- * </code>
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite;
+import com.greensock.plugins.~~; 
+TweenPlugin.activate([TransformMatrixPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {transformMatrix:{x:50, y:300, scaleX:2, scaleY:2}}); 
+
+//-OR-
+
+TweenLite.to(mc, 1, {transformMatrix:{tx:50, ty:300, a:2, d:2}}); 
+</listing>
  * 
  * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
