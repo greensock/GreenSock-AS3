@@ -10,23 +10,23 @@ package com.greensock.plugins {
  * [AS3/AS2 only] Performs SLERP interpolation between 2 Quaternions. Each Quaternion should have x, y, z, and w properties.
  * Simply pass in an Object containing properties that correspond to your object's quaternion properties. 
  * For example, if your myCamera3D has an "orientation" property that's a Quaternion and you want to 
- * tween its values to x:1, y:0.5, z:0.25, w:0.5, you could do:<br /><br /><code>
+ * tween its values to x:1, y:0.5, z:0.25, w:0.5, you could do:<p><code>
  * 
- * 	TweenLite.to(myCamera3D, 2, {quaternions:{orientation:new Quaternion(1, 0.5, 0.25, 0.5)}});<br /><br /></code>
+ * 	TweenLite.to(myCamera3D, 2, {quaternions:{orientation:new Quaternion(1, 0.5, 0.25, 0.5)}});</code></p>
  * 	
- * You can define as many quaternion properties as you want.<br /><br />
+ * <p>You can define as many quaternion properties as you want.</p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.QuaternionsPlugin; <br />
- * 		TweenPlugin.activate([QuaternionsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin;
+import com.greensock.plugins.QuaternionsPlugin; 
+TweenPlugin.activate([QuaternionsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(myCamera3D, 2, {quaternions:{orientation:new Quaternion(1, 0.5, 0.25, 0.5)}}); 
+</listing>
  * 
- * 		TweenLite.to(myCamera3D, 2, {quaternions:{orientation:new Quaternion(1, 0.5, 0.25, 0.5)}}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

@@ -7,20 +7,20 @@
 package com.greensock.plugins {
 	import com.greensock.TweenLite;
 /**
- * [AS3/AS2 only] Tweens numbers in an Array. <br /><br />
+ * [AS3/AS2 only] Tweens numbers in an Array.
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.EndArrayPlugin; <br />
- * 		TweenPlugin.activate([EndArrayPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin;
+import com.greensock.plugins.EndArrayPlugin;
+TweenPlugin.activate([EndArrayPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+var myArray:Array = [1,2,3,4];
+TweenLite.to(myArray, 1.5, {endArray:[10,20,30,40]});
+</listing>
  * 
- * 		var myArray:Array = [1,2,3,4];<br />
- * 		TweenLite.to(myArray, 1.5, {endArray:[10,20,30,40]}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */	

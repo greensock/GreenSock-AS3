@@ -13,21 +13,21 @@ package com.greensock.plugins {
 	import flash.geom.Transform;
 /**
  * [AS3/AS2 only] To change a DisplayObject's tint/color, set this to the hex value of the tint you'd like
- * to end up at (or begin at if you're using <code>TweenMax.from()</code>). An example hex value would be <code>0xFF0000</code>.<br /><br />
+ * to end up at (or begin at if you're using <code>TweenMax.from()</code>). An example hex value would be <code>0xFF0000</code>.
  * 
- * To remove a tint completely, use the RemoveTintPlugin (after activating it, you can just set <code>removeTint:true</code>) <br /><br />
+ * <p>To remove a tint completely, set the tint to <code>null</code></p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.TintPlugin; <br />
- * 		TweenPlugin.activate([TintPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite;
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.TintPlugin; 
+TweenPlugin.activate([TintPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {tint:0xFF0000}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {tint:0xFF0000}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

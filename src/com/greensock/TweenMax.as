@@ -343,11 +343,11 @@ package com.greensock {
  * <p>If the TintPlugin wasn't activated, TweenLite would act as though you were trying to literally tween the 
  * <code>mc.tint</code> property (and there is no such thing).</p>
  * 
- * p>In the JavaScript version of TweenMax, activating a plugin is as simple as loading the associated .js file. 
+ * <p>In the JavaScript version of TweenMax, activating a plugin is as simple as loading the associated .js file. 
  * No extra activation code is necessary. And by default, the JavaScript version of TweenMax includes the CSSPlugin
  * and RoundPropsPlugin so you don't need to load those separately. In the ActionScript version, activating a plugin 
  * requires a single line of code and you only need to do it once, so it's pretty easy. Simply pass an Array containing 
- * the names of all the plugins you'd like to activate to the <code>TweenPlugin.activate()</code> method, like this:
+ * the names of all the plugins you'd like to activate to the <code>TweenPlugin.activate()</code> method, like this:</p>
  * 
  * <p><code>
  * TweenPlugin.activate([FrameLabelPlugin, ColorTransformPlugin, TintPlugin]);
@@ -525,7 +525,7 @@ package com.greensock {
  * 		<a href="http://www.greensock.com/club/">http://www.greensock.com/club/</a></li>
  * 	</ul>
  * 	  
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

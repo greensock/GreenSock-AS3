@@ -9,19 +9,19 @@ package com.greensock.plugins {
 	import com.greensock.*;
 	import com.greensock.plugins.*;
 /**
- * [AS3/AS2 only] Tweens the volume of an object with a soundTransform property (MovieClip/SoundChannel/NetStream, etc.). <br /><br />
+ * [AS3/AS2 only] Tweens the volume of an object with a soundTransform property (MovieClip/SoundChannel/NetStream, etc.). 
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.VolumePlugin; <br />
- * 		TweenPlugin.activate([VolumePlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.VolumePlugin; 
+TweenPlugin.activate([VolumePlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {volume:0}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {volume:0}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

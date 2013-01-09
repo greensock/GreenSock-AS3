@@ -34,20 +34,20 @@ package com.greensock.plugins {
  * 		<li><b>useRadians</b> : Boolean - If you prefer to define values in radians instead of degrees, set useRadians to true.</li>
  * </ul>
  * 
- * <br /><br />
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.~~; <br />
- * 		import com.greensock.plugins.~~; <br />
- * 		import com.greensock.motionPaths.~~<br />
- * 		TweenPlugin.activate([CirclePath2DPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
  * 
- * 		var circle:CirclePath2D = new CirclePath2D(150, 150, 100);
- * 		TweenLite.to(mc, 2, {circlePath2D:{path:circle, startAngle:90, endAngle:270, direction:Direction.CLOCKWISE, extraRevolutions:2}}); <br /><br />
- * </code>
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.~~; 
+import com.greensock.plugins.~~;
+import com.greensock.motionPaths.~~;
+TweenPlugin.activate([CirclePath2DPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+var circle:CirclePath2D = new CirclePath2D(150, 150, 100);
+TweenLite.to(mc, 2, {circlePath2D:{path:circle, startAngle:90, endAngle:270, direction:Direction.CLOCKWISE, extraRevolutions:2}});
+</listing>
  * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

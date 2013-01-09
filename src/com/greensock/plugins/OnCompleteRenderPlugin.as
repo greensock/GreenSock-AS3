@@ -6,6 +6,7 @@
  **/
 package com.greensock.plugins {
 	import com.greensock.TweenLite;
+	
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 
@@ -13,7 +14,6 @@ package com.greensock.plugins {
  * [AS3 only] Calls a function as soon as the tween completes AND the final frame actually renders to the screen.  
  * It accomplishes this by waiting until the next <code>ENTER_FRAME</code> event gets dispatched before calling the function.
  * (a regular onComplete gets called as soon as the tween sets its final values but before things are rendered graphically to the screen).
- * 
  * 
  * <p><strong>USAGE:</strong></p>
  * <listing version="3.0">
@@ -25,7 +25,7 @@ TweenPlugin.activate([OnCompleteRenderPlugin]); //activation is permanent in the
 TweenLite.to(mc, 1, {x:100, onCompleteRender:myFunc});  //tweens horizontal and vertical scale simultaneously
 </listing>
  * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

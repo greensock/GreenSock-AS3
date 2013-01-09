@@ -12,9 +12,9 @@ package com.greensock.plugins {
  * [AS3/AS2 only] Ever wanted to tween ColorTransform properties of a DisplayObject to do advanced effects like overexposing, altering
  * the brightness or setting the percent/amount of tint? Or maybe tween individual ColorTransform 
  * properties like redMultiplier, redOffset, blueMultiplier, blueOffset, etc. ColorTransformPlugin gives you an easy way to 
- * do just that. <br /><br />
+ * do just that. 
  * 
- * <b>PROPERTIES:</b><br />
+ * <p><b>PROPERTIES:</b></p>
  * <ul>
  * 		<li><code> tint (or color) : uint</code> - Color of the tint. Use a hex value, like 0xFF0000 for red.</li>
  * 		<li><code> tintAmount : Number</code> - Number between 0 and 1. Works with the "tint" property and indicats how much of an effect the tint should have. 0 makes the tint invisible, 0.5 is halfway tinted, and 1 is completely tinted.</li>
@@ -28,19 +28,19 @@ package com.greensock.plugins {
  * 		<li><code> greenMultiplier : Number</code></li>
  * 		<li><code> blueMultiplier : Number</code></li>
  * 		<li><code> alphaMultiplier : Number</code> </li>
- * </ul><br /><br />
+ * </ul>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.ColorTransformPlugin; <br />
- * 		TweenPlugin.activate([ColorTransformPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.ColorTransformPlugin; 
+TweenPlugin.activate([ColorTransformPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {colorTransform:{tint:0xFF0000, tintAmount:0.5}}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {colorTransform:{tint:0xFF0000, tintAmount:0.5}}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

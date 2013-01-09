@@ -11,21 +11,21 @@ package com.greensock.plugins {
  * [AS3/AS2 only] Tweens a MovieClip forward to a particular frame number, wrapping it if/when it reaches the end
  * of the timeline. For example, if your MovieClip has 20 frames total and it is currently at frame 10
  * and you want tween to frame 5, a normal frame tween would go backwards from 10 to 5, but a frameForward
- * would go from 10 to 20 (the end) and wrap to the beginning and continue tweening from 1 to 5. <br /><br />
+ * would go from 10 to 20 (the end) and wrap to the beginning and continue tweening from 1 to 5. 
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.~~; <br />
- * 		TweenPlugin.activate([FrameForwardPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.~~; 
+TweenPlugin.activate([FrameForwardPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {frameForward:5}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {frameForward:5}); <br /><br />
- * </code>
+ * <p>Note: When tweening the frames of a MovieClip, any audio that is embedded on the MovieClip's timeline (as "stream") will not be played. 
+ * Doing so would be impossible because the tween might speed up or slow down the MovieClip to any degree.</p>
  * 
- * Note: When tweening the frames of a MovieClip, any audio that is embedded on the MovieClip's timeline (as "stream") will not be played. 
- * Doing so would be impossible because the tween might speed up or slow down the MovieClip to any degree.<br /><br />
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

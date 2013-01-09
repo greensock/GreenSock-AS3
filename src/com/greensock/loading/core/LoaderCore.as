@@ -36,7 +36,7 @@ package com.greensock.loading.core {
  * Serves as the base class for GreenSock loading tools like <code>LoaderMax, ImageLoader, XMLLoader, SWFLoader</code>, etc. 
  * There is no reason to use this class on its own. Please see the documentation for the other classes.
  * 
- * <p><strong>Copyright 2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */	

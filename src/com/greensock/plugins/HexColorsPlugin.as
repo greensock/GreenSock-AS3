@@ -13,34 +13,35 @@ package com.greensock.plugins {
  * To tween a property of your object that's a hex color to another hex color, just pass a hexColors 
  * Object with properties named the same as your object's hex color properties. For example, 
  * if myObject has a "myHexColor" property that you'd like to tween to red (<code>0xFF0000</code>) over the 
- * course of 2 seconds, you'd do:<br /><br /><code>
+ * course of 2 seconds, you'd do:<p><code>
  * 	
- * 	TweenMax.to(myObject, 2, {hexColors:{myHexColor:0xFF0000}});<br /><br /></code>
+ * 	TweenMax.to(myObject, 2, {hexColors:{myHexColor:0xFF0000}});</code></p>
  * 	
- * You can pass in any number of hexColor properties. <br /><br />
+ * <p>You can pass in any number of properties. </p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.HexColorsPlugin; <br />
- * 		TweenPlugin.activate([HexColorsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin;
+import com.greensock.plugins.HexColorsPlugin;
+TweenPlugin.activate([HexColorsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(myObject, 2, {hexColors:{myProperty:0xFF0000}});
+</listing>
  * 
- * 		TweenLite.to(myObject, 2, {hexColors:{myHexColor:0xFF0000}}); <br /><br /></code>
+ * <p>Or if you just want to tween a color and apply it somewhere on every frame, you could do:</p>
+ * <listing version="3.0">
+var myColor:Object = {hex:0xFF0000};
+TweenLite.to(myColor, 2, {hexColors:{hex:0x0000FF}, onUpdate:applyColor});
+function applyColor() {
+	mc.graphics.clear();
+	mc.graphics.beginFill(myColor.hex, 1);
+	mc.graphics.drawRect(0, 0, 100, 100);
+	mc.graphics.endFill();
+}
+</listing>
  * 
- * Or if you just want to tween a color and apply it somewhere on every frame, you could do:<br /><br /><code>
- * 
- * var myColor:Object = {hex:0xFF0000};<br />
- * TweenLite.to(myColor, 2, {hexColors:{hex:0x0000FF}, onUpdate:applyColor});<br />
- * function applyColor():void {<br />
- * 		mc.graphics.clear();<br />
- * 		mc.graphics.beginFill(myColor.hex, 1);<br />
- * 		mc.graphics.drawRect(0, 0, 100, 100);<br />
- * 		mc.graphics.endFill();<br />
- * }<br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

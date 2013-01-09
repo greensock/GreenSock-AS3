@@ -6,9 +6,9 @@
  **/
  package com.greensock.layout {
 /**
- * Provides constants for defining how objects should scale/stretch to fit within an area (like a <code>LiquidArea</code> or <code>AutoFitArea</code>). <br /><br /> 
+ * Provides constants for defining how objects should scale/stretch to fit within an area (like a <code>LiquidArea</code> or <code>AutoFitArea</code>). 
  * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.
+ * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */	

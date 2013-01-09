@@ -1,6 +1,12 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
 
+2013-01-08
+----------------------------------------
+XMLLoader			1.931
+LoaderMax			1.931
+	- Fixed issue that could cause redundant childComplete events to get fired from XMLLoader if you defined load="true" inside BOTH a <LoaderMax> node and its child node.
+
 2012-09-05
 ----------------------------------------
 VideoLoader			1.93

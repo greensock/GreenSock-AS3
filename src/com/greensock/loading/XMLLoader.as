@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.891
- * DATE: 2011-11-03
+ * VERSION: 1.931
+ * DATE: 2013-01-08
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -219,7 +219,7 @@ function completeHandler(event:LoaderEvent):void {
  }
  </listing>
  * 
- * <p><strong>Copyright 2010-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @see com.greensock.loading.data.XMLLoaderVars
  * 
@@ -530,7 +530,7 @@ function completeHandler(event:Event):void {
 						}
 					}
 					var loader:LoaderCore = all.append(new loaderClass(xml.@url, parsedVars));
-					if (toLoad != null && loader.vars.load) {
+					if (toLoad != null && loader.vars.load && !all.vars.load) {
 						toLoad.append(loader);
 					}
 				}

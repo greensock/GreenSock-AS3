@@ -12,29 +12,29 @@ package com.greensock.plugins {
  * a normal rotation tween would travel a total of 340 degrees in the counter-clockwise direction, 
  * but if you use shortRotation, it would travel 20 degrees in the clockwise direction instead. You 
  * can define any number of rotation properties in the shortRotation object which makes 3D tweening
- * easier, like:<br /><br /><code> 
+ * easier, like:<p><code> 
  * 		
- * 		TweenMax.to(mc, 2, {shortRotation:{rotationX:-170, rotationY:35, rotationZ:200}}); <br /><br /></code>
+ * 		TweenMax.to(mc, 2, {shortRotation:{rotationX:-170, rotationY:35, rotationZ:200}}); </code></p>
  * 
- * Normally shortRotation is defined in degrees, but if you prefer to have it work with radians instead,
- * simply set the <code>useRadians</code> special property to <code>true</code> like:<br /><br /><code>
+ * <p>Normally shortRotation is defined in degrees, but if you prefer to have it work with radians instead,
+ * simply set the <code>useRadians</code> special property to <code>true</code> like:</p><p><code>
  * 
- * 		TweenMax.to(myCustomObject, 2, {shortRotation:{customRotationProperty:Math.PI, useRadians:true}});</code><br /><br />
+ * 		TweenMax.to(myCustomObject, 2, {shortRotation:{customRotationProperty:Math.PI, useRadians:true}});</code></p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.ShortRotationPlugin; <br />
- * 		TweenPlugin.activate([ShortRotationPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
- * 
- * 		TweenLite.to(mc, 1, {shortRotation:{rotation:-170}});<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.ShortRotationPlugin; 
+TweenPlugin.activate([ShortRotationPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {shortRotation:{rotation:-170}});
 	
- * 		//or for a 3D tween with multiple rotation values...<br />
- * 		TweenLite.to(mc, 1, {shortRotation:{rotationX:-170, rotationY:35, rotationZ:10}}); <br /><br />
- * </code>
+//or for a 3D tween with multiple rotation values...
+TweenLite.to(mc, 1, {shortRotation:{rotationX:-170, rotationY:35, rotationZ:10}}); 
+</listing>
  * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

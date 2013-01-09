@@ -15,16 +15,16 @@ package com.greensock.plugins {
  * 	
  * 	TweenMax.to(mc, 2, {x:300, y:200, alpha:0.5, roundProps:"x,y"});<br /><br /></code>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenMax; <br /> 
- * 		import com.greensock.plugins.RoundPropsPlugin; <br />
- * 		TweenPlugin.activate([RoundPropsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenMax; 
+import com.greensock.plugins.RoundPropsPlugin;
+TweenPlugin.activate([RoundPropsPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenMax.to(mc, 2, {x:300, y:200, alpha:0.5, roundProps:"x,y"}); 
+</listing>
  * 
- * 		TweenMax.to(mc, 2, {x:300, y:200, alpha:0.5, roundProps:"x,y"}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

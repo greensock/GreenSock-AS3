@@ -16,22 +16,22 @@ package com.greensock.plugins {
  * main TweenLite class or changing the syntax altogether to onChangeRatio:{func:myFunction, params:[1,2]} which is
  * even more inconsistent) and because it is such a niche plugin (typically only used with SteppedEase which is quite
  * niche itself). It can be very useful to reuse a single callback method but it must be able to figure out which tween
- * changed its ratio and access its target which is why onChangeRatio passes the tween as the parameter. <br /><br />
+ * changed its ratio and access its target which is why onChangeRatio passes the tween as the parameter. 
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.OnChangeRatioPlugin; <br />
- * 		TweenPlugin.activate([OnChangeRatioPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.OnChangeRatioPlugin; 
+TweenPlugin.activate([OnChangeRatioPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 3, {x:500, onChangeRatio:changeHandler, ease:SteppedEase.create(5)}); 
+function changeHandler(tween:TweenLite):void {
+		trace("ratio: " + tween.ratio);
+}
+</listing>
  * 
- * 		TweenLite.to(mc, 3, {x:500, onChangeRatio:changeHandler, ease:SteppedEase.create(5)}); <br />
- * 		function changeHandler(tween:TweenLite):void {<br />
- * 			trace("ratio: " + tween.ratio);<br />
- * 		}<br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

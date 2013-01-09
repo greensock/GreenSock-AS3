@@ -185,7 +185,7 @@ package com.greensock.loading {
  * 		<li>You will not see the image unless you either manually add it to the display list in your onComplete handler or simply use the <code>container</code> special property (see above).</li>
  * </ul>
  * 
- * <p><strong>Copyright 2010-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @see com.greensock.loading.data.ImageLoaderVars
  * 

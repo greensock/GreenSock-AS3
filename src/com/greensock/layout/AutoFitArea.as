@@ -26,25 +26,24 @@ package com.greensock.layout {
  * (or simply use it like a regular Shape by adding it to the display list with <code>addChild()</code>, but the 
  * <code>preview</code> property makes it simpler because it automatically ensures that it is behind 
  * all of its attached DisplayObjects in the stacking order).
- * <br /><br />
  * 
- * When you <code>attach()</code> a DisplayObject, you can define a minimum and maximum width and height.
+ * <p>When you <code>attach()</code> a DisplayObject, you can define a minimum and maximum width and height.
  * AutoFitArea doesn't require that the DisplayObject's registration point be in its upper left corner
  * either. You can even set the <code>calculateVisible</code> parameter to true when attaching an object
  * so that AutoFitArea will ignore masked areas inside the DisplayObject (this is more processor-intensive, 
- * so beware).<br /><br />
+ * so beware).</p>
  * 
- * For scaling, AutoFitArea alters the DisplayObject's <code>width</code> and/or <code>height</code>
+ * <p>For scaling, AutoFitArea alters the DisplayObject's <code>width</code> and/or <code>height</code>
  * properties unless it is rotated in which case it alters the DisplayObject's <code>transform.matrix</code> 
- * directly so that accurate stretching/skewing can be accomplished. <br /><br />
+ * directly so that accurate stretching/skewing can be accomplished. </p>
  * 
- * There is also a <code>LiquidArea</code> class that extends AutoFitArea and integrates with 
+ * <p>There is also a <code>LiquidArea</code> class that extends AutoFitArea and integrates with 
  * <a href="http://www.greensock.com/liquidstage/">LiquidStage</a> so that it automatically 
  * adjusts its size whenever the stage is resized. This makes it simple to create things like 
  * a background that proportionally fills the stage or a bar that always stretches horizontally 
- * to fill the stage but stays stuck to the bottom, etc.<br /><br />
+ * to fill the stage but stays stuck to the bottom, etc.</p>
  *	
- * @example Example AS3 code:<listing version="3.0">
+ * <listing version="3.0">
 import com.greensock.layout.~~;
 
 //create a 300x100 rectangular area at x:50, y:70 that stretches when the stage resizes (as though its top left and bottom right corners are pinned to their corresponding PinPoints on the stage)
@@ -68,7 +67,7 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 </listing>
  *
  * 
- * <b>Copyright 2010-2012, GreenSock. All rights reserved.</b> This work is subject to the license that came with your Club GreenSock membership and is <b>ONLY</b> to be used by "Business Green" or "Shockingly Green" Club GreenSock members. To learn more about Club GreenSock, visit <a href="http://www.greensock.com/club/">http://www.greensock.com/club/</a>.
+ * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */	 
@@ -486,9 +485,9 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 		 * properties were updated inside the tween. So to maximize performance during a tween, it is best 
 		 * to use the tween's <code>onStart</code> to call <code>enableTweenMode()</code> at the beginning 
 		 * of the tween, use the tween's <code>onUpdate</code> to call the area's <code>update()</code> method, 
-		 * and then the tween's <code>onComplete</code> to call <code>disableTweenMode()</code> like so:<br /><br /><code>
+		 * and then the tween's <code>onComplete</code> to call <code>disableTweenMode()</code> like so:<p><code>
 		 * 
-		 * TweenLite.to(myArea, 3, {x:100, y:50, width:300, height:250, onStart:myArea.enableTweenMode, onUpdate:myArea.update, onComplete:myArea.disableTweenMode});</code>
+		 * TweenLite.to(myArea, 3, {x:100, y:50, width:300, height:250, onStart:myArea.enableTweenMode, onUpdate:myArea.update, onComplete:myArea.disableTweenMode});</code></p>
 		 **/
 		public function enableTweenMode():void {
 			_tweenMode = true;
@@ -504,9 +503,9 @@ var area:AutoFitArea = AutoFitArea.createAround(myImage);
 		 * properties were updated inside the tween. So to maximize performance during a tween, it is best 
 		 * to use the tween's <code>onStart</code> to call <code>enableTweenMode()</code> at the beginning 
 		 * of the tween, use the tween's <code>onUpdate</code> to call the area's <code>update()</code> method, 
-		 * and then the tween's <code>onComplete</code> to call <code>disableTweenMode()</code> like so:<br /><br /><code>
+		 * and then the tween's <code>onComplete</code> to call <code>disableTweenMode()</code> like so:<p><code>
 		 * 
-		 * TweenLite.to(myArea, 3, {x:100, y:50, width:300, height:250, onStart:myArea.enableTweenMode, onUpdate:myArea.update, onComplete:myArea.disableTweenMode});</code>
+		 * TweenLite.to(myArea, 3, {x:100, y:50, width:300, height:250, onStart:myArea.enableTweenMode, onUpdate:myArea.update, onComplete:myArea.disableTweenMode});</code></p>
 		 **/
 		public function disableTweenMode():void {
 			_tweenMode = false;

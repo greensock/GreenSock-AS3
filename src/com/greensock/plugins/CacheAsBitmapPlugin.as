@@ -13,23 +13,23 @@ package com.greensock.plugins {
  * performance in certain situations, like when the DisplayObject <strong>NOT</strong> tweening its rotation, scaleX, scaleY, or similar
  * things with its <code>transform.matrix</code>. See Adobe's docs for details about when it is appropriate to set <code>cacheAsBitmap</code>
  * to <code>true</code>. Also beware that whenever a DisplayObject's <code>cacheAsBitmap</code> is <code>true</code>, it will ONLY be
- * rendered on whole pixel values which can lead to animation that looks "choppy" at slow speeds.<br /><br /> 
+ * rendered on whole pixel values which can lead to animation that looks "choppy" at slow speeds.
  * 
- * For example, if you want to set <code>cacheAsBitmap</code> to <code>true</code> while the tween is running, do:<br /><br /><code>
+ * <p>For example, if you want to set <code>cacheAsBitmap</code> to <code>true</code> while the tween is running, do:</p><p><code>
  * 
- * TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true});<br /><br /></code>
+ * TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true});</code></p>
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.CacheAsBitmapPlugin; <br />
- * 		TweenPlugin.activate([CacheAsBitmapPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.CacheAsBitmapPlugin; 
+TweenPlugin.activate([CacheAsBitmapPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

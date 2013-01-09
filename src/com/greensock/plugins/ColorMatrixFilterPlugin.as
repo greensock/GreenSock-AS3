@@ -24,36 +24,36 @@ package com.greensock.plugins {
  * 		<li><code> addFilter : Boolean [false] </code></li>
  * 		<li><code> remove : Boolean [false] </code> (Set remove to true if you want the filter to be removed when the tween completes.)</li>
  * </ul>
- * HINT: If you'd like to match the ColorMatrixFilter values you created in the Flash IDE on a particular object, you can get its matrix like this:<br /><br /><code>
+ * <p>HINT: If you'd like to match the ColorMatrixFilter values you created in the Flash IDE on a particular object, you can get its matrix like this:</p>
+ * <listing version="3.0">
+import flash.display.DisplayObject; 
+import flash.filters.ColorMatrixFilter;
+
+function getColorMatrix(mc:DisplayObject):Array { 
+   var f:Array = mc.filters, i:uint; 
+	   for (i = 0; i &lt; f.length; i++) { 
+	      if (f[i] is ColorMatrixFilter) { 
+         return f[i].matrix; 
+      } 
+   }
+   return null;
+} 
+
+var myOriginalMatrix:Array = getColorMatrix(my_mc); //store it so you can tween back to it anytime like TweenMax.to(my_mc, 1, {colorMatrixFilter:{matrix:myOriginalMatrix}});
+</listing>
  * 
- * 	import flash.display.DisplayObject; <br />
- * 	import flash.filters.ColorMatrixFilter; <br /><br />
- * 	
- * 	function getColorMatrix(mc:DisplayObject):Array { <br />
- * 	   var f:Array = mc.filters, i:uint; <br />
- * 	   for (i = 0; i &lt; f.length; i++) { <br />
- * 	      if (f[i] is ColorMatrixFilter) { <br />
- * 	         return f[i].matrix; <br />
- * 	      } <br />
- * 	   } <br />
- * 	   return null; <br />
- * 	} <br /><br />
- * 	 
- * 	var myOriginalMatrix:Array = getColorMatrix(my_mc); //store it so you can tween back to it anytime like TweenMax.to(my_mc, 1, {colorMatrixFilter:{matrix:myOriginalMatrix}});
- * </code>
- * <br /><br />
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.ColorMatrixFilterPlugin; <br />
- * 		TweenPlugin.activate([ColorMatrixFilterPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite;
+import com.greensock.plugins.TweenPlugin;
+import com.greensock.plugins.ColorMatrixFilterPlugin;
+TweenPlugin.activate([ColorMatrixFilterPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {colorMatrixFilter:{colorize:0xFF0000}});
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {colorMatrixFilter:{colorize:0xFF0000}}); <br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

@@ -12,18 +12,18 @@ package com.greensock.plugins {
  * [AS3 only] Sets the stage's <code>quality</code> to a particular value during a tween and another value after
  * the tween which can be useful for improving rendering performance in the Flash Player while things are animating. <br /><br />
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.StageQualityPlugin; <br />
- * 		import flash.display.StageQuality; <br />
- * 		TweenPlugin.activate([StageQualityPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite; 
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.StageQualityPlugin; 
+import flash.display.StageQuality; 
+TweenPlugin.activate([StageQualityPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {x:100, stageQuality:{stage:this.stage, during:StageQuality.LOW, after:StageQuality.HIGH}}); 
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {x:100, stageQuality:{stage:this.stage, during:StageQuality.LOW, after:StageQuality.HIGH}}); <br /><br />
- * </code>
- * 
- * <b>Copyright 2011, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.
+ * <p><b>Copyright 2008-2013, GreenSock. All rights reserved.</b> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */

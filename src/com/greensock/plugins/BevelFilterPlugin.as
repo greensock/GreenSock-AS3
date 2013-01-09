@@ -8,7 +8,7 @@ package com.greensock.plugins {
 	import com.greensock.TweenLite;
 	import flash.filters.BevelFilter;
 /**
- * [AS3/AS2 only] Tweens a BevelFilter. The following properties are available (you only need to define the ones you want to tween): <br />
+ * [AS3/AS2 only] Tweens a BevelFilter. The following properties are available (you only need to define the ones you want to tween): 
  * <code>
  * <ul>
  * 		<li> distance : Number [0]</li>
@@ -28,17 +28,17 @@ package com.greensock.plugins {
  * </code>
  * 
  * 
- * <b>USAGE:</b><br /><br />
- * <code>
- * 		import com.greensock.TweenLite; <br />
- * 		import com.greensock.plugins.TweenPlugin; <br />
- * 		import com.greensock.plugins.BevelFilterPlugin; <br />
- * 		TweenPlugin.activate([BevelFilterPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.<br /><br />
+ * <p><b>USAGE:</b></p>
+ * <listing version="3.0">
+import com.greensock.TweenLite;
+import com.greensock.plugins.TweenPlugin; 
+import com.greensock.plugins.BevelFilterPlugin; 
+TweenPlugin.activate([BevelFilterPlugin]); //activation is permanent in the SWF, so this line only needs to be run once.
+
+TweenLite.to(mc, 1, {bevelFilter:{blurX:10, blurY:10, distance:6, angle:45, strength:1}});
+</listing>
  * 
- * 		TweenLite.to(mc, 1, {bevelFilter:{blurX:10, blurY:10, distance:6, angle:45, strength:1}});<br /><br />
- * </code>
- * 
- * <p><strong>Copyright 2008-2012, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */
