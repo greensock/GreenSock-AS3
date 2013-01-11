@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.72
- * DATE: 2012-11-16
+ * VERSION: 12.0 beta 5.75
+ * DATE: 2013-01-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -1180,7 +1180,7 @@ TweenLite.fromTo(myWindow, 1, {scaleX:0, scaleY:0}, {scaleX:1, scaleY:1});
 				return this;
 			}
 			
-			super.insert(value, _parseTimeOrLabel(timeOrLabel || 0, 0, true));
+			super.insert(value, _parseTimeOrLabel(timeOrLabel || 0, 0, true, value));
 			
 			//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly.  
 			if (_gc) if (!_paused) if (_time == _duration) if (_time < duration()) {
@@ -1269,7 +1269,7 @@ myTimeline.append(nested);
 		 * @see #insertMultiple()
 		 */
 		public function append(value:*, offsetOrLabel:*=0):* {
-			return insert(value, _parseTimeOrLabel(null, offsetOrLabel, true));
+			return insert(value, _parseTimeOrLabel(null, offsetOrLabel, true, value));
 		}
 		
 		/**
@@ -1290,7 +1290,7 @@ myTimeline.append(nested);
 		 * @see #staggerFromTo()
 		 */
 		public function insertMultiple(tweens:Array, timeOrLabel:*=0, align:String="normal", stagger:Number=0):* {
-			var i:int, tween:*, curTime:Number = _parseTimeOrLabel(timeOrLabel || 0, 0, true), l:Number = tweens.length;
+			var i:int, tween:*, curTime:Number = _parseTimeOrLabel(timeOrLabel || 0, 0, true, tweens), l:Number = tweens.length;
 			for (i = 0; i < l; i++) {
 				if ((tween = tweens[i]) is Array) {
 					tween = new TimelineLite({tweens:tween});
@@ -1323,7 +1323,7 @@ myTimeline.append(nested);
 		 * @return The array of tweens that were appended
 		 */
 		public function appendMultiple(tweens:Array, offsetOrLabel:*=0, align:String="normal", stagger:Number=0):* {
-			return insertMultiple(tweens, _parseTimeOrLabel(null, offsetOrLabel, true), align, stagger);
+			return insertMultiple(tweens, _parseTimeOrLabel(null, offsetOrLabel, true, tweens), align, stagger);
 		}
 		
 		/**
@@ -1364,7 +1364,18 @@ myTimeline.append(nested);
 		}
 		
 		/** @private **/
-		protected function _parseTimeOrLabel(timeOrLabel:*, offsetOrLabel:*=0, appendIfAbsent:Boolean=false):Number {
+		protected function _parseTimeOrLabel(timeOrLabel:*, offsetOrLabel:*=0, appendIfAbsent:Boolean=false, ignore:Object=null):Number {
+			//if we're about to add a tween/timeline (or an array of them) that's already a child of this timeline, we should remove it first so that it doesn't contaminate the duration().
+			if (ignore is Animation && ignore.timeline == this) {
+				remove(ignore);
+			} else if (ignore is Array) {
+				var i:int = ignore.length;
+				while (--i > -1) {
+					if (ignore[i] is Animation && ignore[i].timeline == this) {
+						remove(ignore[i]);
+					}
+				}
+			}
 			if (typeof(offsetOrLabel) === "string") {
 				return _parseTimeOrLabel(offsetOrLabel, (appendIfAbsent && typeof(timeOrLabel) === "number" && !(offsetOrLabel in _labels)) ? timeOrLabel - duration() : 0, appendIfAbsent);
 			}
