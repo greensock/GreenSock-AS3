@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0 beta 4.1
- * DATE: 2012-02-29
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -24,7 +24,7 @@ function animateIn():Animation {
 function animateOut():Animation {
 	var tl:TimelineLite = new TimelineLite();
 	tl.to(this, 1, {scaleX:0.5, scaleY:0.5});
-	tl.to(this, 0.5, {autoAlpha:0}, -0.25);
+	tl.to(this, 0.5, {autoAlpha:0}, "-=0.25");
 	return tl;
 }
 
@@ -37,8 +37,8 @@ anim.reverse();
 
 //or somewhere else, we could build a sequence like this:
 var tl:TimelineLite = new TimelineLite();
-tl.append( animateIn() );
-tl.append( animateOut(), 3);
+tl.add( animateIn() );
+tl.add( animateOut(), 3);
 </listing>
  * 
  * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
@@ -47,7 +47,7 @@ tl.append( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:Number = 12.0;
+		public static const version:String = "12.0.0";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -165,7 +165,7 @@ Animation.ticker.removeEventListener("tick", myFunction);
 		/** @private Previous Animation in the linked list. **/
 		public var _prev:Animation;
 		
-		/** The <code>vars</code> object passed into the constructor which stores configuration variables like onComplete, onUpdate, etc. as well as tweening properties like alpha, x, y or whatever. **/
+		/** The <code>vars</code> object passed into the constructor which stores configuration variables like onComplete, onUpdate, etc. as well as tweening properties like opacity, x, y or whatever. **/
 		public var vars:Object;
 		/** [Read-only] Parent timeline. Every animation is placed onto a timeline (the root timeline by default) and can only have one parent. An instance cannot exist in multiple timelines at once. **/
 		public var timeline:SimpleTimeline;
@@ -176,7 +176,7 @@ Animation.ticker.removeEventListener("tick", myFunction);
 		 * Constructor 
 		 * 
 		 * @param duration duration in seconds (or frames for frames-based tweens)
-		 * @param vars configuration variables (for example, <code>{x:100, y:0, alpha:0.5, onComplete:myFunction}</code>)
+		 * @param vars configuration variables (for example, <code>{x:100, y:0, opacity:0.5, onComplete:myFunction}</code>)
 		 */
 		public function Animation(duration:Number=0, vars:Object=null) {
 			this.vars = vars || {};
@@ -205,7 +205,7 @@ Animation.ticker.removeEventListener("tick", myFunction);
 			}
 			
 			var tl:SimpleTimeline = (this.vars.useFrames) ? _rootFramesTimeline : _rootTimeline;
-			tl.insert(this, tl._time);
+			tl.add(this, tl._time);
 			
 			_reversed = (this.vars.reversed == true);
 			if (this.vars.paused) {
@@ -462,14 +462,14 @@ myAnimation.play(2, false);
 		 * 
 		 * @param enabled Enabled state of the animation
 		 * @param ignoreTimeline By default, the tween/timeline will remove itself from its parent timeline when it is disabled and add itself when it is enabled, but this parameter allows you to skip that behavior.
-		 * @return Boolean value indicating whether or not important properties may have changed when the animation was enabled/disabled. For example, when a MotionBlurPlugin is disabled, it swaps out a BitmapData for the target and may alter the alpha. We need to know this in order to determine whether or not a new tween that is overwriting this one should be re-initialized with the changed properties. 
+		 * @return Boolean value indicating whether or not important properties may have changed when the animation was enabled/disabled. For example, when a MotionBlurPlugin is disabled, it swaps out a BitmapData for the target and may alter the opacity. We need to know this in order to determine whether or not a new tween that is overwriting this one should be re-initialized with the changed properties. 
 		 **/
 		public function _enabled(enabled:Boolean, ignoreTimeline:Boolean=false):Boolean {
 			_gc = !enabled; //note: it is possible for _gc to be true and timeline not to be null in situations where a parent TimelineLite/Max has completed and is removed - the developer might hold a reference to that timeline and later restart() it or something. 
 			_active = Boolean(enabled && !_paused && _totalTime > 0 && _totalTime < _totalDuration);
 			if (!ignoreTimeline) {
 				if (enabled && timeline == null) {
-					_timeline.insert(this, _startTime - _delay);
+					_timeline.add(this, _startTime - _delay);
 				} else if (!enabled && timeline != null) {
 					_timeline._remove(this, true);
 				}
@@ -477,7 +477,7 @@ myAnimation.play(2, false);
 			return false;
 		}
 		
-		/** @private Same as <code>kill()</code> except that it returns a Boolean that indicates whether or not important properties may have changed when the animation was killed. For example, when a MotionBlurPlugin is disabled, it swaps out a BitmapData for the target and may alter the alpha. We need to know this in order to determine whether or not a new tween that is overwriting this one should be re-initialized with the changed properties. **/
+		/** @private Same as <code>kill()</code> except that it returns a Boolean that indicates whether or not important properties may have changed when the animation was killed. For example, when a MotionBlurPlugin is disabled, it swaps out a BitmapData for the target and may alter the opacity. We need to know this in order to determine whether or not a new tween that is overwriting this one should be re-initialized with the changed properties. **/
 		public function _kill(vars:Object=null, target:Object=null):Boolean {
 			return _enabled(false, false);
 		}
@@ -507,8 +507,8 @@ myAnimation.play(2, false);
  //kill only the "x" and "y" properties of animations of the target "myObject":
  myAnimation.kill({x:true, y:true}, myObject);
   
- //kill only the "alpha" properties of animations of the targets "myObject1" and "myObject2":
- myAnimation.kill({alpha:true}, [myObject1, myObject2]);
+ //kill only the "opacity" properties of animations of the targets "myObject1" and "myObject2":
+ myAnimation.kill({opacity:true}, [myObject1, myObject2]);
 		 </listing>
 		 * 
 		 * @param vars To kill only specific properties, use a generic object containing enumerable properties corresponding to the ones that should be killed, like <code>{x:true, y:true}</code>. The values assigned to each property of the object don't matter - the sole purpose of the object is for iteration over the named properties (in this case, <code>x</code> and <code>y</code>). If no object (or <code>null</code>) is defined, <strong>ALL</strong> properties will be killed.
@@ -865,7 +865,7 @@ myAnimation.startTime(2); //sets the start time
 			if (value != _startTime) {
 				_startTime = value;
 				if (timeline) if (timeline._sortChildren) {
-					timeline.insert(this, value - _delay); //ensures that any necessary re-sequencing of Animations in the timeline occurs to make sure the rendering order is correct.
+					timeline.add(this, value - _delay); //ensures that any necessary re-sequencing of Animations in the timeline occurs to make sure the rendering order is correct.
 				}
 			}
 			return this;

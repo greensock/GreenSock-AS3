@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0 beta 2
- * DATE: 2012-08-24
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/

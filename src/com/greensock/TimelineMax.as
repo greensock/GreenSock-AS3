@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0 beta 5.72
- * DATE: 2012-11-16
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -38,9 +38,9 @@ TweenLite.to(mc, 1, {alpha:0, delay:2});
  * 
  * <listing version="3.0">
 var tl = new TimelineMax({repeat:2, repeatDelay:1});
-tl.append( TweenLite.to(mc, 1, {x:100}) );
-tl.append( TweenLite.to(mc, 1, {y:50}) );
-tl.append( TweenLite.to(mc, 1, {alpha:0}) );
+tl.add( TweenLite.to(mc, 1, {x:100}) );
+tl.add( TweenLite.to(mc, 1, {y:50}) );
+tl.add( TweenLite.to(mc, 1, {alpha:0}) );
  
 //then later, control the whole thing...
 tl.pause();
@@ -74,7 +74,7 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 			your code and make it far more efficient. Imagine building your app with common animateIn() 
  * 			and animateOut() methods that return a tween or timeline instance, then you can string 
  * 			things together like 
- * 			<code>myTimeline.append( myObject.animateIn() ).append( myObject.animateOut(), 4).append( myObject2.animateIn(), -0.5)...</code></li>
+ * 			<code>myTimeline.add( myObject.animateIn() ).add( myObject.animateOut(), "+=4").add( myObject2.animateIn(), "-=0.5")...</code></li>
  * 		
  * 		<li> Speed up or slow down the entire timeline with its <code>timeScale()</code> method. 
  * 			You can even tween it to gradually speed up or slow down the animation smoothly.</li>
@@ -156,12 +156,12 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 				 special property to pass in an Array of TweenLite/TweenMax/TimelineLite/TimelineMax 
  * 				 instances. You can use this in conjunction with the <code>align</code> and 
  * 				 <code>stagger</code> special properties to set up complex sequences with minimal code.
- * 				 These values simply get passed to the <code>insertMultiple()</code> method.</li>
+ * 				 These values simply get passed to the <code>add()</code> method.</li>
  * 	
  * 	<li><strong> align </strong>:<em> String</em> -
  * 				 Only used in conjunction with the <code>tweens</code> special property when multiple 
  * 				 tweens are	to be inserted immediately. The value simply gets passed to the 
- * 				 <code>insertMultiple()</code> method. The default is <code>"normal"</code>. 
+ * 				 <code>add()</code> method. The default is <code>"normal"</code>. 
  * 				 Options are:
  * 					<ul>
  * 						<li><strong><code>"sequence"</code></strong>: aligns the tweens one-after-the-other in a sequence</li>
@@ -184,7 +184,7 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 				 second tween will start 0.5 seconds after the first one starts, then 0.5 seconds 
  * 				 later the third one will start, etc. If the align property is <code>"sequence"</code>,
  * 				 there would be 0.5 seconds added between each tween. This value simply gets 
- * 				 passed to the <code>insertMultiple()</code> method. Default is 0.</li>
+ * 				 passed to the <code>add()</code> method. Default is 0.</li>
  * 
  *  <li><strong> onStart </strong>:<em> Function</em> -
  * 				 A function that should be called when the timeline begins (when its <code>time</code>
@@ -328,13 +328,13 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
 var tl = new TimelineMax({repeat:3, repeatDelay:1, onComplete:myFunction});
 
 //add a tween
-tl.append( new TweenLite(mc, 1, {x:200, y:100}) );
+tl.add( new TweenLite(mc, 1, {x:200, y:100}) );
 		
 //add another tween at the end of the timeline (makes sequencing easy)
-tl.append( new TweenLite(mc, 0.5, {alpha:0}) );
+tl.add( new TweenLite(mc, 0.5, {alpha:0}) );
  
 //append a tween using the convenience method (shorter syntax) and offset it by 0.5 seconds
-tl.to(mc, 1, {rotation:30}, 0.5);
+tl.to(mc, 1, {rotation:30}, "+=0.5");
  		
 //reverse anytime
 tl.reverse();
@@ -343,7 +343,7 @@ tl.reverse();
 tl.addLabel("spin", 3);
 
 //insert a rotation tween at the "spin" label (you could also define the insertion point as the time instead of a label)
-tl.insert( new TweenLite(mc, 2, {rotation:"360"}), "spin");
+tl.add( new TweenLite(mc, 2, {rotation:"360"}), "spin");
 	
 //go to the "spin" label and play the timeline from there
 tl.play("spin");
@@ -351,7 +351,7 @@ tl.play("spin");
 //nest another TimelineMax inside your timeline...
 var nested = new TimelineMax();
 nested.to(mc2, 1, {x:200}));
-tl.append(nested);
+tl.add(nested);
 </listing>
  * 
  * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
@@ -361,7 +361,7 @@ tl.append(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 12.0;
+		public static const version:String = "12.0.0";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -425,12 +425,12 @@ tl.append(nested);
 		 * 				 special property to pass in an Array of TweenLite/TweenMax/TimelineLite/TimelineMax 
 		 * 				 instances. You can use this in conjunction with the <code>align</code> and 
 		 * 				 <code>stagger</code> special properties to set up complex sequences with minimal code.
-		 * 				 These values simply get passed to the <code>insertMultiple()</code> method.</li>
+		 * 				 These values simply get passed to the <code>add()</code> method.</li>
 		 * 	
 		 * 	<li><strong> align </strong>:<em> String</em> -
 		 * 				 Only used in conjunction with the <code>tweens</code> special property when multiple 
 		 * 				 tweens are	to be inserted immediately. The value simply gets passed to the 
-		 * 				 <code>insertMultiple()</code> method. The default is <code>"normal"</code>. 
+		 * 				 <code>add()</code> method. The default is <code>"normal"</code>. 
 		 * 				 Options are:
 		 * 					<ul>
 		 * 						<li><strong><code>"sequence"</code></strong>: aligns the tweens one-after-the-other in a sequence</li>
@@ -453,7 +453,7 @@ tl.append(nested);
 		 * 				 second tween will start 0.5 seconds after the first one starts, then 0.5 seconds 
 		 * 				 later the third one will start, etc. If the align property is <code>"sequence"</code>,
 		 * 				 there would be 0.5 seconds added between each tween. This value simply gets 
-		 * 				 passed to the <code>insertMultiple()</code> method. Default is 0.</li>
+		 * 				 passed to the <code>add()</code> method. Default is 0.</li>
 		 * 
 		 *  <li><strong> onStart </strong>:<em> Function</em> -
 		 * 				 A function that should be called when the timeline begins (when its <code>time</code>
@@ -609,15 +609,15 @@ tl.append(nested);
 		}
 		
 		/**
-		 * Inserts a callback at a particular time or label. The callback is technically considered a 
-		 * zero-duration tween, so if you getChildren() there will be a tween returned for each callback. 
+		 * Inserts a callback at a particular position. The callback is technically considered a 
+		 * zero-duration tween, so if you <code>getChildren()</code> there will be a tween returned for each callback. 
 		 * You can discern a callback from other tweens by the fact that its target is a function matching
 		 * its <code>vars.onComplete</code> and its <code>duration</code> is zero. 
 		 * 
 		 * <p>If your goal is to append the callback to the end of the timeline, it would be easier
-		 * (more concise) to use the <code>call()</code> method. Technically the <code>insert()</code> and 
-		 * <code>append()</code> methods can accommodate adding a callback (like <code>myTimeline.insert(myFunction, 2)</code>
-		 * or <code>myTimeline.append(myFunction)</code>) but they don't accommodate parameters.</p>
+		 * (more concise) to use the <code>call()</code> method. Technically the <code>add()</code> method
+		 * can accommodate adding a callback too (like <code>myTimeline.add(myFunction, 2)</code>
+		 * or <code>myTimeline.add(myFunction, "+=2")</code>) but <code>add()</code> doesn't accommodate parameters.</p>
 		 * 
 		 * <p><strong>JavaScript and AS2 note:</strong> - Due to the way JavaScript and AS2 don't 
 		 * maintain scope (what "<code>this</code>" refers to, or the context) in function calls, 
@@ -625,38 +625,37 @@ tl.append(nested);
 		 * versions accept an extra (4th) parameter for <code>scope</code>.</p>
 		 * 
 		 * @param function The function to be called
-		 * @param timeOrLabel The time in seconds (or frames for frames-based timelines) or label at which the callback should be inserted. For example, <code>myTimeline.addCallback(myFunction, 3)</code> would call myFunction() 3 seconds into the timeline, and <code>myTimeline.addCallback(myFunction, "myLabel")</code> would call it at the "myLabel" label.
+		 * @param position The time in seconds (or frames for frames-based timelines) or label at which the callback should be inserted. For example, <code>myTimeline.addCallback(myFunction, 3)</code> would call myFunction() 3 seconds into the timeline, and <code>myTimeline.addCallback(myFunction, "myLabel")</code> would call it at the "myLabel" label. <code>myTimeline.addCallback(myFunction, "+=2")</code> would insert the callback 2 seconds after the end of the timeline.
 		 * @param params An Array of parameters to pass the callback
 		 * @return self (makes chaining easier)
 		 * 
 		 * @see #call()
-		 * @see #insert()
-		 * @see #append()
+		 * @see #add()
 		 * @see #removeCallback()
 		 */
-		public function addCallback(callback:Function, timeOrLabel:*, params:Array=null):TimelineMax {
-			return insert( TweenLite.delayedCall(0, callback, params), timeOrLabel) as TimelineMax;
+		public function addCallback(callback:Function, position:*, params:Array=null):TimelineMax {
+			return add( TweenLite.delayedCall(0, callback, params), position) as TimelineMax;
 		}
 		
 		/**
-		 * Removes a callback from a particular time or label. If the <code>timeOrLabel</code> parameter
+		 * Removes a callback. If the <code>position</code> parameter
 		 * is null, all callbacks of that function are removed from the timeline.
 		 * 
 		 * @param function callback function to be removed
-		 * @param timeOrLabel the time in seconds (or frames for frames-based timelines) or label from which the callback should be removed. For example, <code>myTimeline.removeCallback(myFunction, 3)</code> would remove the callback from 3-seconds into the timeline, and <code>myTimeline.removeCallback(myFunction, "myLabel")</code> would remove it from the "myLabel" label, and <code>myTimeline.removeCallback(myFunction, null)</code> would remove ALL callbacks of that function regardless of where they are on the timeline.
+		 * @param position the time in seconds (or frames for frames-based timelines) or label from which the callback should be removed. For example, <code>myTimeline.removeCallback(myFunction, 3)</code> would remove the callback from 3-seconds into the timeline, and <code>myTimeline.removeCallback(myFunction, "myLabel")</code> would remove it from the "myLabel" label, and <code>myTimeline.removeCallback(myFunction, null)</code> would remove ALL callbacks of that function regardless of where they are on the timeline.
 		 * @return self (makes chaining easier)
 		 * 
 		 * @see #addCallback()
 		 * @see #call()
 		 * @see #killTweensOf()
 		 */
-		public function removeCallback(callback:Function, timeOrLabel:*=null):TimelineMax {
-			if (timeOrLabel == null) {
+		public function removeCallback(callback:Function, position:*=null):TimelineMax {
+			if (position == null) {
 				_kill(null, callback);
 			} else {
 				var a:Array = getTweensOf(callback, false),
 					i:int = a.length,
-					time:Number = _parseTimeOrLabel(timeOrLabel);
+					time:Number = _parseTimeOrLabel(position);
 				while (--i > -1) {
 					if (a[i]._startTime === time) {
 						a[i]._enabled(false, false);
@@ -677,10 +676,10 @@ tl.append(nested);
 		 * <p>If you want advanced control over the tween, like adding an onComplete or changing the ease or 
 		 * adding a delay, just pass in a <code>vars</code> object with the appropriate properties. For example, 
 		 * to tween to the 5-second point on the timeline and then call a function named <code>myFunction</code> 
-		 * and pass in a parameter that's references this TimelineMax and use a <code>StrongOut</code> ease, you'd do:</p>
+		 * and pass in a parameter that's references this TimelineMax and use a <code>Strong.easeOut</code> ease, you'd do:</p>
 		 * 
 		 * <p><code>
-		 * myTimeline.tweenTo(5, {onComplete:myFunction, onCompleteParams:[myTimeline], ease:StrongOut.ease});
+		 * myTimeline.tweenTo(5, {onComplete:myFunction, onCompleteParams:[myTimeline], ease:Strong.easeOut});
 		 * </code></p>
 		 * 
 		 * <p>Remember, this method simply creates a TweenLite instance that pauses the timeline and then tweens 
@@ -697,20 +696,20 @@ tl.append(nested);
 		 * <code>tweenFromTo()</code> so that you can define the starting point and ending point, allowing the 
 		 * duration to be accurately determined immediately.</p>
 		 * 
-		 * @param timeOrLabel The destination time in seconds (or frame if the timeline is frames-based) or label to which the timeline should play. For example, <code>myTimeline.tweenTo(5)</code> would play from wherever the timeline is currently to the 5-second point whereas <code>myTimeline.tweenTo("myLabel")</code> would play to wherever "myLabel" is on the timeline.
+		 * @param position The destination time in seconds (or frame if the timeline is frames-based) or label to which the timeline should play. For example, <code>myTimeline.tweenTo(5)</code> would play from wherever the timeline is currently to the 5-second point whereas <code>myTimeline.tweenTo("myLabel")</code> would play to wherever "myLabel" is on the timeline.
 		 * @param vars An optional vars object that will be passed to the TweenLite instance. This allows you to define an onComplete, ease, delay, or any other TweenLite special property.
 		 * @return A TweenLite instance that handles tweening the timeline to the desired time/label.
 		 * 
 		 * @see #tweenFromTo()
 		 * @see #seek()
 		 */
-		public function tweenTo(timeOrLabel:*, vars:Object=null):TweenLite {
+		public function tweenTo(position:*, vars:Object=null):TweenLite {
 			vars = vars || {};
 			var copy:Object = {ease:_easeNone, overwrite:2, useFrames:usesFrames(), immediateRender:false};
 			for (var p:String in vars) {
 				copy[p] = vars[p];
 			}
-			copy.time = _parseTimeOrLabel(timeOrLabel);
+			copy.time = _parseTimeOrLabel(position);
 			var t:TweenLite = new TweenLite(this, (Math.abs(Number(copy.time) - _time) / _timeScale) || 0.001, copy);
 			copy.onStart = function():void {
 				t.target.paused(true);
@@ -735,18 +734,18 @@ tl.append(nested);
 		 * 
 		 * <listing version="3.0">
 var tl:TimelineMax = new TimelineMax(); 
-tl.append( myTimeline.tweenFromTo("myLabel1", "myLabel2") );
-tl.append( myTimeline.tweenFromTo("myLabel2", 0);
+tl.add( myTimeline.tweenFromTo("myLabel1", "myLabel2") );
+tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 </listing>
 		 * 
 		 * <p>If you want advanced control over the tween, like adding an onComplete or changing the ease 
 		 * or adding a delay, just pass in a vars object with the appropriate properties. For example, 
 		 * to tween from the start (0) to the 5-second point on the timeline and then call a function 
 		 * named <code>myFunction</code> and pass in a parameter that references this TimelineMax and 
-		 * use a <code>StrongOut</code> ease, you'd do: </p>
+		 * use a <code>Strong.easeOut</code> ease, you'd do: </p>
 		 * 
 		 * <p><code>
-		 * myTimeline.tweenFromTo(0, 5, {onComplete:myFunction, onCompleteParams:[myTimeline], ease:StrongOut.ease});
+		 * myTimeline.tweenFromTo(0, 5, {onComplete:myFunction, onCompleteParams:[myTimeline], ease:Strong.easeOut});
 		 * </code></p>
 		 * 
 		 * <p>Remember, this method simply creates a TweenLite instance that tweens the <code>time()</code> 
@@ -759,18 +758,18 @@ tl.append( myTimeline.tweenFromTo("myLabel2", 0);
 		 * and it does not automatically resume after the tween completes. If you need to resume playback, 
 		 * you can always use an onComplete to call the <code>resume()</code> method.</p>
 		 * 
-		 * @param fromTimeOrLabel The beginning time in seconds (or frame if the timeline is frames-based) or label from which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
-		 * @param toTimeOrLabel The destination time in seconds (or frame if the timeline is frames-based) or label to which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
+		 * @param fromPosition The beginning time in seconds (or frame if the timeline is frames-based) or label from which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
+		 * @param toPosition The destination time in seconds (or frame if the timeline is frames-based) or label to which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
 		 * @param vars An optional vars object that will be passed to the TweenLite instance. This allows you to define an onComplete, ease, delay, or any other TweenLite special property. onInit is the only special property that is not available (<code>tweenFromTo()</code> sets it internally)
 		 * @return TweenLite instance that handles tweening the timeline between the desired times/labels.
 		 * 
 		 * @see #tweenTo()
 		 * @see #seek()
 		 */
-		public function tweenFromTo(fromTimeOrLabel:*, toTimeOrLabel:*, vars:Object=null):TweenLite {
+		public function tweenFromTo(fromPosition:*, toPosition:*, vars:Object=null):TweenLite {
 			vars = vars || {};
-			vars.startAt = {time:_parseTimeOrLabel(fromTimeOrLabel)};
-			var t:TweenLite = tweenTo(toTimeOrLabel, vars);
+			vars.startAt = {time:_parseTimeOrLabel(fromPosition)};
+			var t:TweenLite = tweenTo(toPosition, vars);
 			return t.duration((Math.abs( t.vars.time - t.vars.startAt.time) / _timeScale) || 0.001) as TweenLite;
 		}
 		

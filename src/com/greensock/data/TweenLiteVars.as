@@ -66,9 +66,6 @@ package com.greensock.data {
 					_vars[p] = vars[p];
 				}
 			}
-			if (TweenLite.version < 12) {
-				trace("WARNING: it is suggested that you update to at least version 12 of TweenLite in order for TweenLiteVars to work properly. http://www.greensock.com/tweenlite/"); 
-			}
 		}
 		
 		/** @private **/

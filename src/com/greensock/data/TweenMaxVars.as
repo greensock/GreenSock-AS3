@@ -51,7 +51,7 @@ package com.greensock.data {
  */	 
 	public class TweenMaxVars {
 		/** @private **/
-		public static const version:Number = 12;
+		public static const version:String = "12.0.0";
 		
 		/** @private **/
 		protected var _vars:Object;
@@ -66,9 +66,6 @@ package com.greensock.data {
 				for (var p:String in vars) {
 					_vars[p] = vars[p];
 				}
-			}
-			if (TweenMax.version < 12) {
-				trace("WARNING: it is suggested that you update to at least version 12 of TweenMax in order for TweenMaxVars to work properly. http://www.greensock.com/tweenmax/"); 
 			}
 		}
 		

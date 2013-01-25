@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0 (alpha 3)
- * DATE: 2012-02-23
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -88,7 +88,7 @@ package com.greensock.plugins {
  */
 	public class TweenPlugin {
 		/** @private **/
-		public static const version:Number = 12;
+		public static const version:String = "12.0.0";
 		
 		/** @private If the API/Framework for plugins changes in the future, this number helps determine compatibility **/
 		public static const API:Number = 2; 

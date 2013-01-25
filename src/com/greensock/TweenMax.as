@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.72
- * DATE: 2012-11-16
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -19,7 +19,6 @@ package com.greensock {
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.utils.getTimer;
-
 /**
  * TweenMax extends TweenLite, adding many useful (but non-essential) features like repeat(), 
  * repeatDelay(), yoyo(), AS3 event dispatching, updateTo(), pauseAll(), and more. It also activates many extra plugins 
@@ -531,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:Number = 12.0;
+		public static const version:String = "12.0.0";
 		
 		TweenPlugin.activate([
 			
@@ -737,9 +736,6 @@ var a2 = TweenMax.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 		 */
 		public function TweenMax(target:Object, duration:Number, vars:Object) {
 			super(target, duration, vars);
-			if (TweenLite.version < 12) {
-				throw new Error("TweenMax error! Please update your TweenLite class or try deleting your ASO files. TweenMax requires a more recent version. Download updates at http://www.greensock.com.");
-			}
 			_yoyo = (this.vars.yoyo == true);
 			_repeat = uint(this.vars.repeat);
 			_repeatDelay = this.vars.repeatDelay || 0;

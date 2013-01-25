@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 4.2
- * DATE: 2012-03-22
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -61,48 +61,66 @@ package com.greensock.core {
 		}
 		
 		/**
+		 * @private
+		 * <strong>[Deprecated in favor of add()]</strong>
 		 * Inserts a TweenLite, TweenMax, TimelineLite, or TimelineMax instance into the timeline at a specific time. 
 		 * In classes like TimelineLite and TimelineMax that override this method, it allows things like callbacks,
 		 * labels, and arrays of tweens/timelines/callbacks/labels to be inserted too. They also allow the time to
 		 * be defined in terms of either a numeric time or a label (String).
 		 * 
-		 * @param tween TweenLite, TweenMax, TimelineLite, or TimelineMax instance to insert
-		 * @param time The time in seconds (or frames for frames-based timelines) at which the tween/timeline should be inserted. For example, <code>myTimeline.insert(myTween, 3)</code> would insert myTween 3 seconds into the timeline.
+		 * @param child TweenLite, TweenMax, TimelineLite, or TimelineMax instance to insert
+		 * @param position The time in seconds (or frames for frames-based timelines) at which the tween/timeline should be inserted. For example, <code>myTimeline.insert(myTween, 3)</code> would insert myTween 3 seconds into the timeline.
 		 * @return this timeline instance (useful for chaining like <code>myTimeline.insert(...).insert(...)</code>)
 		 */
-		public function insert(tween:*, time:*=0):* {
-			tween._startTime = Number(time || 0) + tween._delay;
-			if (tween._paused) if (this != tween._timeline) { //we only adjust the _pauseTime if it wasn't in this timeline already. Remember, sometimes a tween will be inserted again into the same timeline when its startTime is changed so that the tweens in the TimelineLite/Max are re-ordered properly in the linked list (so everything renders in the proper order). 
-				tween._pauseTime = tween._startTime + ((rawTime() - tween._startTime) / tween._timeScale);
+		public function insert(child:*, position:*=0):* {
+			return add(child, position || 0);
+		}
+		
+		/**
+		 * Adds a TweenLite, TweenMax, TimelineLite, or TimelineMax instance to the timeline at a specific time. 
+		 * In classes like TimelineLite and TimelineMax that override this method, it allows things like callbacks,
+		 * labels, and arrays of tweens/timelines/callbacks/labels to be inserted too. They also allow the position to
+		 * be defined in terms of either a numeric time or a label (String).
+		 * 
+		 * @param child TweenLite, TweenMax, TimelineLite, or TimelineMax instance to insert
+		 * @param position The position at which the tween/timeline should be inserted which can be expressed as a number (for an absolute time as seconds or frames for frames-based timelines) or a string, using "+=" or "-=" prefix to indicate a relative value (relative to the END of the timeline). For example, <code>myTimeline.insert(myTween, 3)</code> would insert myTween 3 seconds into the timeline.
+		 * @param align Determines how the tweens/timelines/callbacks/labels will be aligned in relation to each other before getting inserted. Options are: <code>"sequence"</code> (aligns them one-after-the-other in a sequence), <code>"start"</code> (aligns the start times of all of the objects (ignoring delays)), and <code>"normal"</code> (aligns the start times of all the tweens (honoring delays)). The default is <code>"normal"</code>.
+		 * @param stagger Staggers the inserted objects by a set amount of time (in seconds) (or in frames for frames-based timelines). For example, if the stagger value is 0.5 and the <code>"align"</code> parameter is set to <code>"start"</code>, the second one will start 0.5 seconds after the first one starts, then 0.5 seconds later the third one will start, etc. If the align property is <code>"sequence"</code>, there would be 0.5 seconds added between each tween. Default is 0.
+ 		 * @return this timeline instance (useful for chaining like <code>myTimeline.add(...).add(...)</code>)
+		 */
+		public function add(child:*, position:*="+=0", align:String="normal", stagger:Number=0):* {
+			child._startTime = Number(position || 0) + child._delay;
+			if (child._paused) if (this != child._timeline) { //we only adjust the _pauseTime if it wasn't in this timeline already. Remember, sometimes a tween will be inserted again into the same timeline when its startTime is changed so that the tweens in the TimelineLite/Max are re-ordered properly in the linked list (so everything renders in the proper order). 
+				child._pauseTime = child._startTime + ((rawTime() - child._startTime) / child._timeScale);
 			}
-			if (tween.timeline) {
-				tween.timeline._remove(tween, true); //removes from existing timeline so that it can be properly added to this one.
+			if (child.timeline) {
+				child.timeline._remove(child, true); //removes from existing timeline so that it can be properly added to this one.
 			}
-			tween.timeline = tween._timeline = this;
-			if (tween._gc) {
-				tween._enabled(true, true);
+			child.timeline = child._timeline = this;
+			if (child._gc) {
+				child._enabled(true, true);
 			}
 			
 			var prevTween:Animation = _last;
 			if (_sortChildren) {
-				var st:Number = tween._startTime;
+				var st:Number = child._startTime;
 				while (prevTween && prevTween._startTime > st) {
 					prevTween = prevTween._prev;
 				}
 			}
 			if (prevTween) {
-				tween._next = prevTween._next;
-				prevTween._next = Animation(tween);
+				child._next = prevTween._next;
+				prevTween._next = Animation(child);
 			} else {
-				tween._next = _first;
-				_first = Animation(tween);
+				child._next = _first;
+				_first = Animation(child);
 			}
-			if (tween._next) {
-				tween._next._prev = tween;
+			if (child._next) {
+				child._next._prev = child;
 			} else {
-				_last = Animation(tween);
+				_last = Animation(child);
 			}
-			tween._prev = prevTween;
+			child._prev = prevTween;
 			
 			if (_timeline) {
 				_uncache(true);

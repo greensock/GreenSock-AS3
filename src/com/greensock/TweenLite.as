@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0 beta 5.72
- * DATE: 2012-11-16
+ * VERSION: 12.0.0
+ * DATE: 2013-01-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:Number = 12.0;
+		public static const version:String = "12.0.0";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);

@@ -1,5 +1,5 @@
 ﻿/**
- * VERSION: 12.0
+ * VERSION: 12.0.0
  * DATE: 2012-02-23
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
