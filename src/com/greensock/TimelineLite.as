@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.0
- * DATE: 2013-01-21
+ * VERSION: 12.0.1
+ * DATE: 2013-02-09
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.0";
+		public static const version:String = "12.0.1";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -1445,6 +1445,11 @@ myAnimation.seek("myLabel");
 			} else if (!_active && !_paused) {
 				_active = true; 
 			}
+			
+			if (time < _time) {
+				trace("backwards: "+time+" instead of old: "+_time+" for "+this.data);
+			}
+			
 			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(), 
 				prevTime:Number = _time, 
 				prevStart:Number = _startTime, 
@@ -1646,6 +1651,7 @@ myAnimation.seek("myLabel");
 			while (tween) {
 				if (tween._startTime >= ignoreBeforeTime) {
 					tween._startTime += amount;
+					trace("shifting "+tween._startTime+": "+tween.data);
 				}
 				tween = tween._next;
 			}
@@ -1751,17 +1757,20 @@ myAnimation.seek("myLabel");
 		
 		/**
 		 * Gets the timeline's <code>duration</code> or, if used as a setter, adjusts the timeline's 
-		 * <code>timeScale</code> to fit it within the specified duration. For example, if a TimelineMax instance has 
-		 * a <code>duration</code> of 2 and a <code>repeat</code> of 3, its <code>totalDuration</code> 
-		 * would be 8 (one standard play plus 3 repeats equals 4 total cycles). 
+		 * <code>timeScale</code> to fit it within the specified duration. <code>duration()</code> is identical
+		 * to <code>totalDuration()</code> except for TimelineMax instances that have a non-zero <code>repeat</code> 
+		 * in which case <code>totalDuration</code> includes repeats and repeatDelays whereas <code>duration</code> doesn't. 
+		 * For example, if a TimelineMax instance has a <code>duration</code> of 2 and a <code>repeat</code> of 3, 
+		 * its <code>totalDuration</code> would be 8 (one standard play plus 3 repeats equals 4 total cycles). 
 		 * 
 		 * <p>Due to the fact that a timeline's <code>duration</code> is dictated by its contents, 
 		 * using this method as a setter will simply cause the <code>timeScale</code> to be adjusted
-		 * to fit the current contents into the specified <code>duration</code>. For example, 
-		 * if there are 20-seconds worth of tweens in the timeline and you do <code>myTimeline.duration(10)</code>,
-		 * the <code>timeScale</code> would be changed to 2. If you checked the <code>duration</code> again
-		 * immediately after that, it would still return 20 because technically that is how long all the 
-		 * child tweens/timelines are but upon playback the speed would be doubled because of the <code>timeScale</code>.</p>
+		 * to fit the current contents into the specified <code>duration</code>, but the <code>duration</code> 
+		 * value itself will remain unchanged. For example, if there are 20-seconds worth of tweens in the timeline 
+		 * and you do <code>myTimeline.duration(10)</code>, the <code>timeScale</code> would be changed to 2. 
+		 * If you checked the <code>duration</code> again immediately after that, it would still return 20 because 
+		 * technically that is how long all the child tweens/timelines are but upon playback the speed would 
+		 * be doubled because of the <code>timeScale</code>.</p>
 		 * 
 		 * <p>This method serves as both a getter and setter. Omitting the parameter returns the current 
 		 * value (getter), whereas defining the parameter sets the value (setter) and returns the instance 
@@ -1822,23 +1831,33 @@ myAnimation.totalDuration( 20 ); //adjusts the timeScale so that myAnimation fit
 		override public function totalDuration(value:Number=NaN):* {
 			if (!arguments.length) {
 				if (_dirty) {
-					var max:Number = 0, end:Number, tween:Animation = _first, prevStart:Number = -Infinity, next:Animation;
+					var max:Number = 0,
+						tween:Animation = _last,
+						prevStart:Number = Infinity,
+						prev:Animation, end:Number;
 					while (tween) {
-						next = tween._next; //record it here in case the tween changes position in the sequence...
-						if (tween._startTime < prevStart && _sortChildren) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
+						prev = tween._prev; //record it here in case the tween changes position in the sequence...
+						if (tween._dirty) {
+							tween.totalDuration(); //could change the tween._startTime, so make sure the tween's cache is clean before analyzing it.
+						}
+						if (tween._startTime > prevStart && _sortChildren && !tween._paused) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
 							add(tween, tween._startTime - tween._delay);
 						} else {
 							prevStart = tween._startTime;
 						}
-						if (tween._startTime < 0) {//children aren't allowed to have negative startTimes, so adjust here if one is found.
+						if (tween._startTime < 0 && !tween._paused) { //children aren't allowed to have negative startTimes unless smoothChildTiming is true, so adjust here if one is found.
 							max -= tween._startTime;
+							if (_timeline.smoothChildTiming) {
+								_startTime += tween._startTime / _timeScale;
+							}
 							shiftChildren(-tween._startTime, false, -9999999999);
+							prevStart = 0;
 						}
-						end = tween._startTime + ((!tween._dirty ? tween._totalDuration : tween.totalDuration()) / tween._timeScale);
+						end = tween._startTime + (tween._totalDuration / tween._timeScale);
 						if (end > max) {
 							max = end;
 						}
-						tween = next;
+						tween = prev;
 					}
 					_duration = _totalDuration = max;
 					_dirty = false;

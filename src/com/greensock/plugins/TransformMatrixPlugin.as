@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0
- * DATE: 2012-01-15
+ * VERSION: 12.0.1
+ * DATE: 2013-02-09
  * AS3 
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -110,11 +110,15 @@ TweenLite.to(mc, 1, {transformMatrix:{tx:50, ty:300, a:2, d:2}});
 			if (("rotation" in value) || ("shortRotation" in value) || ("scale" in value && !(value is Matrix)) || ("scaleX" in value) || ("scaleY" in value) || ("skewX" in value) || ("skewY" in value) || ("skewX2" in value) || ("skewY2" in value)) {
 				var ratioX:Number, ratioY:Number;
 				var scaleX:Number = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b); //Bugs in the Flex framework prevent DisplayObject.scaleX from working consistently, so we must determine it using the matrix.
-				if (matrix.a < 0 && matrix.d > 0) {
+				if (scaleX == 0) {
+					matrix.a = scaleX = 0.0001;
+				} else if (matrix.a < 0 && matrix.d > 0) {
 					scaleX = -scaleX;
 				}
 				var scaleY:Number = Math.sqrt(matrix.c * matrix.c + matrix.d * matrix.d); //Bugs in the Flex framework prevent DisplayObject.scaleY from working consistently, so we must determine it using the matrix.
-				if (matrix.d < 0 && matrix.a > 0) {
+				if (scaleY == 0) { 
+					matrix.d = scaleY = 0.0001;
+				} else if (matrix.d < 0 && matrix.a > 0) {
 					scaleY = -scaleY;
 				}
 				var angle:Number = Math.atan2(matrix.b, matrix.a); //Bugs in the Flex framework prevent DisplayObject.rotation from working consistently, so we must determine it using the matrix
@@ -122,7 +126,6 @@ TweenLite.to(mc, 1, {transformMatrix:{tx:50, ty:300, a:2, d:2}});
 					angle += (angle <= 0) ? Math.PI : -Math.PI;
 				}
 				var skewX:Number = Math.atan2(-_matrix.c, _matrix.d) - angle;
-				
 				var finalAngle:Number = angle;
 				if ("shortRotation" in value) {
 					var dif:Number = ((value.shortRotation * _DEG2RAD) - angle) % (Math.PI * 2);
