@@ -1797,6 +1797,14 @@ myTween.time(2); //sets time, jumping to new value just like seek().
 			return totalTime(value, suppressEvents);
 		}
 		
+		/** @inheritDoc **/
+		override public function duration(value:Number=NaN):* {
+			if (!arguments.length) {
+				return this._duration; //don't set _dirty = false because there could be repeats that haven't been factored into the _totalDuration yet. Otherwise, if you create a repeated TweenMax and then immediately check its duration(), it would cache the value and the totalDuration would not be correct, thus repeats wouldn't take effect.
+			}
+			return super.duration(value);
+		}
+		
 		/**
 		 * Gets or sets the total duration of the tween in seconds (or frames for frames-based tweens) 
 		 * <strong>including</strong> any repeats or repeatDelays. <code>duration</code>, by contrast, does 
