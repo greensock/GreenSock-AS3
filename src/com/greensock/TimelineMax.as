@@ -1,6 +1,6 @@
 /**
  * VERSION: 12.0.1
- * DATE: 2013-02-09
+ * DATE: 2013-02-13
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
