@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.1
- * DATE: 2013-02-13
+ * VERSION: 12.0.2
+ * DATE: 2013-02-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.0";
+		public static const version:String = "12.0.2";
 		
 		TweenPlugin.activate([
 			
@@ -964,12 +964,17 @@ tween.updateTo({x:300, y:0}, false);
 			if (!_active) if (!_paused) {
 				_active = true; //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 			}
-			if (prevTotalTime == 0) if (_totalTime != 0 || _duration == 0) if (!suppressEvents) {
-				if (vars.onStart) {
-					vars.onStart.apply(null, vars.onStartParams);
+			if (prevTotalTime == 0) {
+				if (_startAt != null) {
+					_startAt.render(time, suppressEvents, force);
 				}
-				if (_dispatcher) {
-					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.START));
+				if (_totalTime != 0 || _duration == 0) if (!suppressEvents) {
+					if (vars.onStart) {
+						vars.onStart.apply(null, vars.onStartParams);
+					}
+					if (_dispatcher) {
+						_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.START));
+					}
 				}
 			}
 			
@@ -983,11 +988,21 @@ tween.updateTo({x:300, y:0}, false);
 				pt = pt._next;
 			}
 			
-			if (_onUpdate != null) if (!suppressEvents) {
-				_onUpdate.apply(null, vars.onUpdateParams);
+			if (_onUpdate != null) {
+				if (time < 0 && _startAt != null) {
+					_startAt.render(time, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
+				}
+				if (!suppressEvents) {
+					_onUpdate.apply(null, vars.onUpdateParams);
+				}
 			}
-			if (_hasUpdateListener) if (!suppressEvents) {
-				_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
+			if (_hasUpdateListener) {
+				if (time < 0 && _startAt != null && _onUpdate == null) {
+					_startAt.render(time, suppressEvents, force);
+				}
+				if (!suppressEvents) {
+					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
+				}
 			}
 			if (_cycle != prevCycle) if (!suppressEvents) if (!_gc) {
 				if (vars.onRepeat) {
@@ -998,6 +1013,9 @@ tween.updateTo({x:300, y:0}, false);
 				}
 			}
 			if (callback) if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
+				if (time < 0 && _startAt != null && _onUpdate == null && !_hasUpdateListener) {
+					_startAt.render(time, suppressEvents, true);
+				}
 				if (isComplete) {
 					if (_timeline.autoRemoveChildren) {
 						_enabled(false, false);

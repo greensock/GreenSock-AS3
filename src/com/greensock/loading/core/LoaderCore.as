@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.8993
- * DATE: 2012-02-24
+ * VERSION: 1.933
+ * DATE: 2013-02-22
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -42,7 +42,7 @@ package com.greensock.loading.core {
  */	
 	public class LoaderCore extends EventDispatcher {
 		/** @private **/
-		public static const version:Number = 1.87;
+		public static const version:Number = 1.933;
 		
 		/** @private **/
 		protected static var _loaderCount:uint = 0;
@@ -424,13 +424,14 @@ package com.greensock.loading.core {
 		
 		/** @private **/
 		protected function _failHandler(event:Event, dispatchError:Boolean=true):void {
-			_dump(0, LoaderStatus.FAILED);
+			_dump(0, LoaderStatus.FAILED, true);
 			if (dispatchError) {
 				_errorHandler(event);
 			} else {
 				var target:Object = event.target; //trigger the LoaderEvent's target getter once first in order to ensure that it reports properly - see the notes in LoaderEvent.target for more details.
 			}
 			dispatchEvent(new LoaderEvent(LoaderEvent.FAIL, ((event is LoaderEvent && this.hasOwnProperty("getChildren")) ? event.target : this), this.toString() + " > " + (event as Object).text, event));
+			dispatchEvent(new LoaderEvent(LoaderEvent.CANCEL, this));
 		}
 		
 		/** @private **/

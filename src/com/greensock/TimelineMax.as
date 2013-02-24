@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.1
- * DATE: 2013-02-13
+ * VERSION: 12.0.2
+ * DATE: 2013-02-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.1";
+		public static const version:String = "12.0.2";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/

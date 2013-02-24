@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.931
- * DATE: 2013-01-08
+ * VERSION: 1.932
+ * DATE: 2013-02-21
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -229,7 +229,7 @@ function completeHandler(event:LoaderEvent):void {
 		/** @private **/
 		private static var _classActivated:Boolean = _activateClass("XMLLoader", XMLLoader, "xml,php,jsp,asp,cfm,cfml,aspx");
 		/** @private Any non-String variable types that XMLLoader should recognized in loader nodes like <ImageLoader>, <VideoLoader>, etc. **/
-		protected static var _varTypes:Object = {skipFailed:true, skipPaused:true, autoLoad:false, paused:false, load:false, noCache:false, maxConnections:2, autoPlay:false, autoDispose:false, smoothing:false, autoDetachNetStream:false, estimatedBytes:1, x:1, y:1, z:1, rotationX:1, rotationY:1, rotationZ:1, width:1, height:1, scaleX:1, scaleY:1, rotation:1, alpha:1, visible:true, bgColor:0, bgAlpha:0, deblocking:1, repeat:1, checkPolicyFile:false, centerRegistration:false, bufferTime:5, volume:1, bufferMode:false, estimatedDuration:200, crop:false, autoAdjustBuffer:true, suppressInitReparentEvents:true};
+		protected static var _varTypes:Object = {skipFailed:true, skipPaused:true, autoLoad:false, paused:false, load:false, noCache:false, maxConnections:2, autoPlay:false, autoDispose:false, smoothing:false, autoDetachNetStream:false, estimatedBytes:1, x:1, y:1, z:1, rotationX:1, rotationY:1, rotationZ:1, width:1, height:1, scaleX:1, scaleY:1, rotation:1, alpha:1, visible:true, bgColor:0, bgAlpha:0, deblocking:1, repeat:1, checkPolicyFile:false, centerRegistration:false, bufferTime:5, volume:1, bufferMode:false, estimatedDuration:200, crop:false, autoAdjustBuffer:true, suppressInitReparentEvents:true, allowMalformedURL:false};
 		/** Event type constant for when the XML has loaded but has <b>not</b> been parsed yet. This can be useful in rare situations when you want to alter the XML before it is parsed by XMLLoader (for identifying LoaderMax-related nodes like <code>&lt;ImageLoader&gt;</code>, etc.) **/
 		public static var RAW_LOAD:String = "rawLoad";
 		/** @private contains only the parsed loaders that had the load="true" XML attribute. It also contains the _parsed LoaderMax which is paused, so it won't load (we put it in there for easy searching). **/

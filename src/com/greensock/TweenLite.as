@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.1
- * DATE: 2013-02-13
+ * VERSION: 12.0.2
+ * DATE: 2013-02-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.1";
+		public static const version:String = "12.0.2";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -430,6 +430,9 @@ package com.greensock {
 		/** @private If this tween has any TweenPlugins that need to be notified of a change in the "enabled" status, this will be true. (speeds things up in the _enable() setter) **/
 		protected var _notifyPluginsOfEnabled:Boolean;
 		
+		/** @private Only used in tweens where a startAt is defined (like fromTo() tweens) so that we can record the pre-tween starting values and revert to them properly if/when the playhead on the timeline moves backwards, before this tween started. In other words, if alpha is at 1 and then someone does a fromTo() tween that makes it go from 0 to 1 and then the playhead moves BEFORE that tween, alpha should jump back to 1 instead of reverting to 0. **/
+		protected var _startAt:TweenLite;
+		
 		
 		/**
 		 * Constructor
@@ -493,7 +496,7 @@ package com.greensock {
 			if (vars.startAt) {
 				vars.startAt.overwrite = 0;
 				vars.startAt.immediateRender = true;
-				TweenLite.to(target, 0, vars.startAt);
+				_startAt = new TweenLite(target, 0, vars.startAt);
 			}
 			var i:int, initPlugins:Boolean, pt:PropTween;
 			if (vars.ease is Ease) {
@@ -670,8 +673,13 @@ package com.greensock {
 			if (!_active) if (!_paused) {
 				_active = true;  //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 			}
-			if (prevTime == 0) if (vars.onStart) if (_time != 0 || _duration == 0) if (!suppressEvents) {
-				vars.onStart.apply(null, vars.onStartParams);
+			if (prevTime == 0) {
+				if (_startAt != null) {
+					_startAt.render(time, suppressEvents, force);
+				}
+				if (vars.onStart) if (_time != 0 || _duration == 0) if (!suppressEvents) {
+					vars.onStart.apply(null, vars.onStartParams);
+				}
 			}
 			
 			pt = _firstPT;
@@ -684,11 +692,19 @@ package com.greensock {
 				pt = pt._next;
 			}
 			
-			if (_onUpdate != null) if (!suppressEvents) {
-				_onUpdate.apply(null, vars.onUpdateParams);
+			if (_onUpdate != null) {
+				if (time < 0 && _startAt != null) {
+					_startAt.render(time, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
+				}
+				if (!suppressEvents) {
+					_onUpdate.apply(null, vars.onUpdateParams);
+				}
 			}
 			
 			if (callback) if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
+				if (time < 0 && _startAt != null && _onUpdate == null) {
+					_startAt.render(time, suppressEvents, force);
+				}
 				if (isComplete) {
 					if (_timeline.autoRemoveChildren) {
 						_enabled(false, false);

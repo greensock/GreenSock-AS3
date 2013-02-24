@@ -1,5 +1,12 @@
 CHANGE LOG : GREENSOCK LOADERMAX SYSTEM
 ----------------------------------------
+2013-02-21
+----------------------------------------
+XMLLoader			1.932
+LoaderItem			1.932
+LoaderMax			1.932
+	- Added ability for XMLLoader to recognize "allowMalformedURL" in XML nodes
+	- To avoid errors when attempting to load local files, if allowMalformedURL isn't true and there are parameters in the query string, the URLRequest's method will be forced to "POST" (again, ONLY when the swf is running locally, not on the network)
 
 2013-01-08
 ----------------------------------------

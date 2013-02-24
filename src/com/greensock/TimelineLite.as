@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.1
- * DATE: 2013-02-13
+ * VERSION: 12.0.2
+ * DATE: 2013-02-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.1";
+		public static const version:String = "12.0.2";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -1127,8 +1127,8 @@ tl.add([tween1, tween2, tween3], "+=2", "stagger", 0.5);
 		 * 
 		 * @param value The tween, timeline, callback, or label (or array of them) to add
 		 * @param position Controls the placement of the object in the timeline (by default, it's the end of the timeline, like "+=0"). Use a number to indicate an absolute time in terms of seconds (or frames for frames-based timelines), or you can use a string with a "+=" or "-=" prefix to offset the insertion point relative to the END of the timeline. For example, <code>"+=2"</code> would place the object 2 seconds after the end, leaving a 2-second gap. <code>"-=2"</code> would create a 2-second overlap. You may also use a label like <code>"myLabel"</code> to have the object inserted exactly at the label or combine a label and a relative offset like <code>"myLabel+=2"</code> to insert the object 2 seconds after "myLabel" or <code>"myLabel-=3"</code> to insert it 3 seconds before "myLabel". If you define a label that doesn't exist yet, it will <strong>automatically be added to the end of the timeline</strong> before inserting the tween there which can be quite convenient.
-		 * @param align Determines how the tweens/timelines/callbacks/labels will be aligned in relation to each other before getting inserted. Options are: <code>"sequence"</code> (aligns them one-after-the-other in a sequence), <code>"start"</code> (aligns the start times of all of the objects (ignoring delays)), and <code>"normal"</code> (aligns the start times of all the tweens (honoring delays)). The default is <code>"normal"</code>.
-		 * @param stagger Staggers the inserted objects by a set amount of time (in seconds) (or in frames for frames-based timelines). For example, if the stagger value is 0.5 and the <code>"align"</code> parameter is set to <code>"start"</code>, the second one will start 0.5 seconds after the first one starts, then 0.5 seconds later the third one will start, etc. If the align property is <code>"sequence"</code>, there would be 0.5 seconds added between each tween. Default is 0.
+		 * @param align <strong><i>[only relevant when the first parameter, <code>value</code>, is an array]</i></strong> Determines how the tweens/timelines/callbacks/labels in the array that is being added will be aligned in relation to each other before getting inserted. Options are: <code>"sequence"</code> (aligns them one-after-the-other in a sequence), <code>"start"</code> (aligns the start times of all of the objects (ignoring delays)), and <code>"normal"</code> (aligns the start times of all the tweens (honoring delays)). The default is <code>"normal"</code>.
+		 * @param stagger <strong><i>[only relevant when the first parameter, <code>value</code>, is an array]</i></strong> Staggers the inserted objects from the array the is being added by a set amount of time (in seconds) (or in frames for frames-based timelines). For example, if the stagger value is 0.5 and the <code>"align"</code> parameter is set to <code>"start"</code>, the second one will start 0.5 seconds after the first one starts, then 0.5 seconds later the third one will start, etc. If the align property is <code>"sequence"</code>, there would be 0.5 seconds added between each tween. Default is 0.
 		 * @return self (makes chaining easier)
 		 */
 		override public function add(value:*, position:*="+=0", align:String="normal", stagger:Number=0):* {
