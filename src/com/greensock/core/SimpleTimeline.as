@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.0
- * DATE: 2013-01-21
+ * VERSION: 12.0.3
+ * DATE: 2013-02-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -163,9 +163,9 @@ package com.greensock.core {
 				next = tween._next; //record it here because the value could change after rendering...
 				if (tween._active || (time >= tween._startTime && !tween._paused)) {
 					if (!tween._reversed) {
-						tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, false);
+						tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
 					} else {
-						tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, false);
+						tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
 					}
 				}
 				tween = next;

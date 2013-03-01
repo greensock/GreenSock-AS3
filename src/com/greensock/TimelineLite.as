@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.2
- * DATE: 2013-02-21
+ * VERSION: 12.0.3
+ * DATE: 2013-02-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.2";
+		public static const version:String = "12.0.3";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -639,7 +639,7 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel+=2");  //places it 2 seconds after "my
 		 * @see #remove()
 		 */
 		public function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object, position:*="+=0"):* {
-			return add( TweenLite.fromTo(target, duration, fromVars, toVars), position);
+			return add(TweenLite.fromTo(target, duration, fromVars, toVars), position);
 		}
 		
 		/**
@@ -651,7 +651,7 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel+=2");  //places it 2 seconds after "my
 		 * 
 		 * <listing version="3.0">
 var textFields = [tf1, tf2, tf3, tf4, tf5];
-myTimeline.staggerTo(textFields, 1, {y:"+=150", ease:CubicIn.ease}, 0.2);
+myTimeline.staggerTo(textFields, 1, {y:"+=150", ease:Cubic.easeIn}, 0.2);
 </listing>
 		 * <p><code>staggerTo()</code> simply loops through the <code>targets</code> array and creates 
 		 * a <code>to()</code> tween for each object and then inserts it at the appropriate place on a 
@@ -845,9 +845,7 @@ tl.staggerFromTo(myArray, 1, {x:0}, {x:100}, 0.25, "myLabel+=2");  //places 2 se
 			toVars = _prepVars(toVars);
 			fromVars = _prepVars(fromVars);
 			toVars.startAt = fromVars;
-			if (fromVars.immediateRender) {
-				toVars.immediateRender = true;
-			}
+			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
 			return staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams);
 		}
 		
@@ -977,7 +975,11 @@ tl.set(mc, {x:100}, "myLabel+=2");  //places it 2 seconds after "myLabel"
 		 * @see #remove()
 		 */
 		public function set(target:Object, vars:Object, position:*="+=0"):* {
-			vars.immediateRender = false;
+			position = _parseTimeOrLabel(position, 0, true);
+			vars = _prepVars(vars);
+			if (vars.immediateRender == null) {
+				vars.immediateRender = (position === _time && !_paused);
+			}
 			return add( new TweenLite(target, 0, vars), position);
 		}
 		
@@ -1135,35 +1137,35 @@ tl.add([tween1, tween2, tween3], "+=2", "stagger", 0.5);
 			if (typeof(position) !== "number") {
 				position = _parseTimeOrLabel(position, 0, true, value);
 			}
-			if (value is Animation) {
-				//continue...
-			} else if (value is Array) {
-				var i:int, 
-					curTime:Number = Number(position), 
-					l:Number = value.length, 
-					child:*;
-				for (i = 0; i < l; i++) {
-					if ((child = value[i]) is Array) {
-						child = new TimelineLite({tweens:child});
+			if (!(value is Animation)) {
+				if (value is Array) {
+					var i:int, 
+						curTime:Number = Number(position), 
+						l:Number = value.length, 
+						child:*;
+					for (i = 0; i < l; i++) {
+						if ((child = value[i]) is Array) {
+							child = new TimelineLite({tweens:child});
+						}
+						add(child, curTime);
+						if (typeof(child) === "string" || typeof(child) === "function") {
+							//do nothing
+						} else if (align === "sequence") {
+							curTime = child._startTime + (child.totalDuration() / child._timeScale);
+						} else if (align === "start") {
+							child._startTime -= child.delay();
+						}
+						curTime += stagger;
 					}
-					add(child, curTime);
-					if (typeof(child) === "string" || typeof(child) === "function") {
-						//do nothing
-					} else if (align === "sequence") {
-						curTime = child._startTime + (child.totalDuration() / child._timeScale);
-					} else if (align === "start") {
-						child._startTime -= child.delay();
-					}
-					curTime += stagger;
+					return _uncache(true);
+				} else if (typeof(value) === "string") {
+					return addLabel(String(value), position);
+				} else if (typeof(value) === "function") {
+					value = TweenLite.delayedCall(0, value);
+				} else {
+					trace("Cannot add " + value + " into the TimelineLite/Max: it is neither a tween, timeline, function, nor a String.");
+					return this;
 				}
-				return _uncache(true);
-			} else if (typeof(value) === "string") {
-				return addLabel(String(value), position);
-			} else if (typeof(value) === "function") {
-				value = TweenLite.delayedCall(0, value);
-			} else {
-				trace("Cannot add " + value + " into the TimelineLite/Max: it is neither a tween, timeline, function, nor a String.");
-				return this;
 			}
 			
 			super.add(value, position);
@@ -1502,9 +1504,9 @@ myAnimation.seek("myLabel");
 					} else if (tween._active || (tween._startTime <= _time && !tween._paused && !tween._gc)) {
 						
 						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, false);
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
 						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, false);
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
 						}
 						
 					}
@@ -1519,9 +1521,9 @@ myAnimation.seek("myLabel");
 					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
 						
 						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, false);
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
 						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, false);
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
 						}
 						
 					}

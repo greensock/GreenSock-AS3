@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.2
- * DATE: 2013-02-21
+ * VERSION: 12.0.3
+ * DATE: 2013-02-28
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.2";
+		public static const version:String = "12.0.3";
 		
 		TweenPlugin.activate([
 			
@@ -1260,9 +1260,7 @@ TweenMax.fromTo([mc1, mc2, mc3], 1, {x:0}, {x:100});
 			toVars = _prepVars(toVars, false);
 			fromVars = _prepVars(fromVars, false);
 			toVars.startAt = fromVars;
-			if (fromVars.immediateRender) {
-				toVars.immediateRender = true;
-			}
+			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
 			return new TweenMax(target, duration, toVars);
 		}
 		
@@ -1388,6 +1386,9 @@ TweenMax.staggerFrom(textFields, 1, {y:"+150"}, 0.2);
 		public static function staggerFrom(targets:Array, duration:Number, vars:Object, stagger:Number=0, onCompleteAll:Function=null, onCompleteAllParams:Array=null):Array {
 			vars = _prepVars(vars, true);
 			vars.runBackwards = true;
+			if (vars.immediateRender != false) {
+				vars.immediateRender = true;
+			}
 			return staggerTo(targets, duration, vars, stagger, onCompleteAll, onCompleteAllParams);
 		}
 		
@@ -1438,9 +1439,7 @@ TweenMax.staggerFromTo(textFields, 1, {alpha:1}, {alpha:0}, 0.2);
 			toVars = _prepVars(toVars, false);
 			fromVars = _prepVars(fromVars, false);
 			toVars.startAt = fromVars;
-			if (fromVars.immediateRender) {
-				toVars.immediateRender = true;
-			}
+			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
 			return staggerTo(targets, duration, toVars, stagger, onCompleteAll, onCompleteAllParams);
 		}
 		

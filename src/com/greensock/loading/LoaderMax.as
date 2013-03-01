@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 1.933
- * DATE: 2013-02-22
+ * VERSION: 1.934
+ * DATE: 2013-02-28
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -143,7 +143,7 @@ function errorHandler(event:LoaderEvent):void {
  */	
 	public class LoaderMax extends LoaderCore {		
 		/** @private **/
-		public static const version:Number = 1.933;
+		public static const version:Number = 1.934;
 		/** The default value that will be used for the <code>estimatedBytes</code> on loaders that don't declare one in the <code>vars</code> parameter of the constructor. **/
 		public static var defaultEstimatedBytes:uint = 20000;
 		/** Controls the default value of <code>auditSize</code> in LoaderMax instances (normally <code>true</code>). For most situations, the auditSize feature is very convenient for ensuring that the overall progress of LoaderMax instances is reported accurately, but when working with very large quantities of files that have no <code>estimatedBytes</code> defined, some developers prefer to turn auditSize off by default. Of course you can always override the default for individual LoaderMax instances by defining an <code>auditSize</code> value in the <code>vars</code> parameter of the constructor. **/
@@ -523,14 +523,15 @@ function completeHandler(event:LoaderEvent):void {
 		 * 
 		 * @param status Status code like <code>LoaderStatus.READY, LoaderStatus.LOADING, LoaderStatus.COMPLETED, LoaderStatus.PAUSED,</code> or <code>LoaderStatus.FAILED</code>.
 		 * @param includeNested If <code>true</code>, loaders that are nested inside other loaders (like LoaderMax instances or XMLLoaders or SWFLoaders) will be returned in the array.
+		 * @param omitLoaderMaxes If <code>true</code>, no LoaderMax instances will be returned in the array; only LoaderItems like ImageLoaders, XMLLoaders, SWFLoaders, MP3Loaders, etc. The default is <code>false</code>. 
 		 * @return An array of loaders that match the defined <code>status</code>. 
 		 * @see #getChildren()
 		 * @see #getLoader()
 		 * @see #numChildren
 		 */
-		public function getChildrenByStatus(status:int, includeNested:Boolean=false):Array {
+		public function getChildrenByStatus(status:int, includeNested:Boolean=false, omitLoaderMaxes:Boolean=false):Array {
 			var a:Array = [];
-			var loaders:Array = getChildren(includeNested, false);
+			var loaders:Array = getChildren(includeNested, omitLoaderMaxes);
 			var l:int = loaders.length;
 			for (var i:int = 0; i < l; i++) {
 				if (LoaderCore(loaders[i]).status == status) {
@@ -760,7 +761,7 @@ function completeHandler(event:LoaderEvent):void {
 			var loader:LoaderCore, found:Boolean;
 			for (var i:int = 0; i < l; i++) {
 				loader = _loaders[i];
-				if (!loader.auditedSize && loader.status <= maxStatus) {
+				if (!loader.auditedSize && loader.status <= maxStatus && loader.vars.auditSize != false) {
 					if (!found) {
 						loader.addEventListener("auditedSize", _auditSize, false, -100, true);
 						loader.addEventListener(LoaderEvent.FAIL, _auditSize, false, -100, true);
@@ -983,6 +984,13 @@ function completeHandler(event:LoaderEvent):void {
 			return loader;
 		}
 		
+		override protected function _passThroughEvent(event:Event):void {
+			super._passThroughEvent(event);
+			if (!this.skipFailed && (event.type == "fail" || event.type == "childFail") && this.status == LoaderStatus.LOADING) {
+				super._failHandler(new LoaderEvent(LoaderEvent.FAIL, this, "Did not complete LoaderMax because skipFailed was false and " + event.target.toString() + " failed."), false);
+			}
+		}
+		
 		
 //---- GETTERS / SETTERS -------------------------------------------------------------------------
 		
@@ -1025,7 +1033,7 @@ function completeHandler(event:LoaderEvent):void {
 			var maxStatus:int = (this.skipPaused) ? LoaderStatus.COMPLETED : LoaderStatus.PAUSED;
 			var i:int = _loaders.length;
 			while (--i > -1) {
-				if (!LoaderCore(_loaders[i]).auditedSize && LoaderCore(_loaders[i]).status <= maxStatus) {
+				if (!LoaderCore(_loaders[i]).auditedSize && LoaderCore(_loaders[i]).status <= maxStatus &&  _loaders[i].vars.auditSize != false) {
 					return false;
 				}
 			}
