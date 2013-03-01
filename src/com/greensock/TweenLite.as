@@ -1,6 +1,6 @@
 ﻿/**
  * VERSION: 12.0.3
- * DATE: 2013-02-28
+ * DATE: 2013-03-01
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -779,6 +779,9 @@ package com.greensock {
 						if (record) { 
 							overwrittenProps[p] = 1;
 						}
+					}
+					if (_firstPT == null) { //if all tweening properties are killed, kill the tween. Without this line, if there's a tween with multiple targets and then you killTweensOf() each target individually, the tween would technically still remain active and fire its onComplete even though there aren't any more properties tweening. 
+						_enabled(false, false);
 					}
 				}
 			}
