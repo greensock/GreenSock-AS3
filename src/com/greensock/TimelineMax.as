@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.3
- * DATE: 2013-02-28
+ * VERSION: 12.0.4
+ * DATE: 2013-03-17
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -91,7 +91,7 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 			callbacks using the constructor's <code>vars</code> object like
  * 			<code>var tl = new TimelineMax({onComplete:myFunction});</code></li>
  * 
- * 		<li> Kill the tweens of a particular object inside the timeline with <code>killTweensOf()</code> 
+ * 		<li> Kill the tweens of a particular object inside the timeline with <code>kill(null, target)</code> 
  * 			or get the tweens of an object with <code>getTweensOf()</code> or get all the tweens/timelines 
  * 			in the timeline with <code>getChildren()</code></li>
  * 		  
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.3";
+		public static const version:String = "12.0.4";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -647,7 +647,7 @@ tl.add(nested);
 		 * 
 		 * @see #addCallback()
 		 * @see #call()
-		 * @see #killTweensOf()
+		 * @see #kill()
 		 */
 		public function removeCallback(callback:Function, position:*=null):TimelineMax {
 			if (position == null) {
@@ -788,7 +788,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				prevRawPrevTime:Number = _rawPrevTime,
 				prevPaused:Boolean = _paused, 
 				prevCycle:int = _cycle, 
-				tween:Animation, isComplete:Boolean, next:Animation, dur:Number, callback:String;
+				tween:Animation, isComplete:Boolean, next:Animation, dur:Number, callback:String, internalForce:Boolean;
 			if (time >= totalDur) {
 				if (!_locked) {
 					_totalTime = totalDur;
@@ -798,7 +798,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 					isComplete = true;
 					callback = "onComplete";
 					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
-						force = true;
+						internalForce = true;
 					}
 				}
 				_rawPrevTime = time;
@@ -822,10 +822,10 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				if (time < 0) {
 					_active = false;
 					if (_duration == 0) if (_rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						force = true;
+						internalForce = true;
 					}
 				} else if (!_initted) {
-					force = true;
+					internalForce = true;
 				}
 				_rawPrevTime = time;
 				time = (_duration == 0) ? 0 : -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
@@ -904,7 +904,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				_locked = false;
 			}
 			
-			if (_time == prevTime && !force) {
+			if (_time == prevTime && !force && !internalForce) {
 				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
 				}
@@ -960,7 +960,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.UPDATE));
 			}
 			
-			if (callback) if (!_locked) if (!_gc) if (prevStart === _startTime || prevTimeScale != _timeScale) if (_time === 0 || totalDur >= totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
+			if (callback) if (!_locked) if (!_gc) if (prevStart === _startTime || prevTimeScale !== _timeScale) if (_time === 0 || totalDur >= totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
 				if (isComplete) {
 					if (_timeline.autoRemoveChildren) {
 						_enabled(false, false);

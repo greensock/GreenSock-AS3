@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.3
- * DATE: 2013-02-28
+ * VERSION: 12.0.4
+ * DATE: 2013-03-17
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.3";
+		public static const version:String = "12.0.4";
 		
 		TweenPlugin.activate([
 			
@@ -957,6 +957,9 @@ tween.updateTo({x:300, y:0}, false);
 				return;
 			} else if (!_initted) {
 				_init();
+				if (!_initted) { //immediateRender tweens typically won't initialize until the playhead advances (_time is greater than 0) in order to ensure that overwriting occurs properly.
+					return;
+				}
 				if (!isComplete && _time) { //_ease is initially set to defaultEase, so now that init() has run, _ease is set properly and we need to recalculate the ratio. Overall this is faster than using conditional logic earlier in the method to avoid having to set ratio twice because we only init() once but renderTime() gets called VERY frequently.
 					ratio = _ease.getRatio(_time / _duration);
 				}
@@ -1228,6 +1231,15 @@ TweenMax.from([mc1, mc2, mc3], 1.5, {alpha:0});
 		 * special properties for the tween (like onComplete, onUpdate, delay, etc.) belong in the <code>toVars</code> 
 		 * parameter. </p>
 		 * 
+		 * <p>By default, <code>immediateRender</code> is <code>true</code> in 
+		 * <code>fromTo()</code> tweens, meaning that they immediately render their starting state 
+		 * regardless of any delay that is specified. This is done for convenience because it is 
+		 * often the preferred behavior when setting things up on the screen to animate into place, but 
+		 * you can override this behavior by passing <code>immediateRender:false</code> in the 
+		 * <code>fromVars</code> or <code>toVars</code> parameter so that it will wait to render 
+		 * the starting values until the tween actually begins (often the desired behavior when inserting 
+		 * into TimelineLite or TimelineMax instances).</p>
+		 * 
 		 * <p>Since the <code>target</code> parameter can also be an array of objects, the following 
 		 * code will tween the x property of mc1, mc2, and mc3 from 0 to 100 simultaneously:</p>
 		 * 
@@ -1418,6 +1430,15 @@ TweenMax.staggerFromTo(textFields, 1, {alpha:1}, {alpha:0}, 0.2);
 		 * sequence. This can be very useful, but if you want to call a function after the entire
 		 * sequence of tweens has completed, use the <code>onCompleteAll</code> parameter (the 6th parameter).</p>
 		 * 
+		 * <p>By default, <code>immediateRender</code> is <code>true</code> in 
+		 * <code>staggerFromTo()</code> tweens, meaning that they immediately render their starting state 
+		 * regardless of any delay that is specified. This is done for convenience because it is 
+		 * often the preferred behavior when setting things up on the screen to animate into place, but 
+		 * you can override this behavior by passing <code>immediateRender:false</code> in the 
+		 * <code>fromVars</code> or <code>toVars</code> parameter so that it will wait to render 
+		 * the starting values until the tweens actually begin (often the desired behavior when inserting 
+		 * into TimelineLite or TimelineMax instances).</p>
+		 * 
 		 * <p><strong>JavaScript and AS2 note:</strong> - Due to the way JavaScript and AS2 don't 
 		 * maintain scope (what "<code>this</code>" refers to, or the context) in function calls, 
 		 * it can be useful to define the scope specifically. Therefore, in the JavaScript and AS2 
@@ -1518,7 +1539,8 @@ TweenMax.set([obj1, obj2, obj3], {x:100, y:50, alpha:0});
 				i:int = a.length,
 				tween:TweenLite;
 			while (--i > -1) {
-				if (((tween = a[i])._active || (tween._startTime == tween.timeline._time && tween.timeline._active))) {
+				tween = a[i];
+				if (tween._active || (tween._startTime == tween._timeline._time && tween._timeline._active)) {
 					return true;
 				}
 			}
@@ -1690,7 +1712,8 @@ TweenMax.killAll(false, false, true, false);
 				i:int = a.length;
 			while (--i > -1) {
 				tween = a[i];
-				if (allTrue || (tween is SimpleTimeline) || ((isDC = (TweenLite(tween).target == TweenLite(tween).vars.onComplete)) && delayedCalls) || (tweens && !isDC)) {
+				isDC = (TweenLite(tween).target == tween.vars.onComplete);
+				if (allTrue || (tween is SimpleTimeline) || (isDC && delayedCalls) || (tweens && !isDC)) {
 					tween.paused(pause);
 				}
 			}

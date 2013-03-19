@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.84
- * DATE: 2011-03-23
+ * VERSION: 1.841
+ * DATE: 2013-03-12
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -143,6 +143,7 @@ function errorHandler(event:LoaderEvent):void {
 			_loader.addEventListener("ioError", _failHandler, false, 0, true);
 			_loader.addEventListener("securityError", _failHandler, false, 0, true);
 			_loader.addEventListener("httpStatus", _httpStatusHandler, false, 0, true);
+			_loader.addEventListener("httpResponseStatus", _httpStatusHandler, false, 0, true);
 		}
 		
 		/** @private **/

@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.3
- * DATE: 2013-02-28
+ * VERSION: 12.0.4
+ * DATE: 2013-03-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -82,7 +82,7 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 			callbacks using the constructor's <code>vars</code> object like
  * 			<code>var tl = new TimelineLite({onComplete:myFunction});</code></li>
  * 
- * 		<li> Kill the tweens of a particular object inside the timeline with <code>killTweensOf()</code> 
+ * 		<li> Kill the tweens of a particular object inside the timeline with <code>kill(null, target)</code> 
  * 			or get the tweens of an object with <code>getTweensOf()</code> or get all the tweens/timelines 
  * 			in the timeline with <code>getChildren()</code></li>
  * 		  
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.3";
+		public static const version:String = "12.0.4";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -626,6 +626,13 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, "+=2");  //appends it 2 seconds after the end (
 tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel");  //places it at "myLabel" (and if "myLabel" doesn't exist yet, it's added to the end and then the tween is inserted there)
 tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel+=2");  //places it 2 seconds after "myLabel"
 </listing>
+		 * <p><strong>NOTE:</strong> by default, <code>immediateRender</code> is <code>true</code> in 
+		 * <code>fromTo()</code> tweens, meaning that they immediately render their starting state 
+		 * regardless of any delay that is specified. This is done for convenience because it is 
+		 * often the preferred behavior when setting things up on the screen to animate into place, but 
+		 * you can override this behavior by passing <code>immediateRender:false</code> in the 
+		 * <code>fromVars</code> or <code>toVars</code> parameter so that it will wait to render 
+		 * the starting values until the tweens actually begin.</p>
 		 * 
 		 * @param target Target object (or array of objects) whose properties the tween affects
 		 * @param duration Duration in seconds (or frames if the timeline is frames-based)
@@ -1144,7 +1151,8 @@ tl.add([tween1, tween2, tween3], "+=2", "stagger", 0.5);
 						l:Number = value.length, 
 						child:*;
 					for (i = 0; i < l; i++) {
-						if ((child = value[i]) is Array) {
+						child = value[i];
+						if (child is Array) {
 							child = new TimelineLite({tweens:child});
 						}
 						add(child, curTime);
@@ -1452,18 +1460,18 @@ myAnimation.seek("myLabel");
 				prevStart:Number = _startTime, 
 				prevTimeScale:Number = _timeScale, 
 				prevPaused:Boolean = _paused,
-				tween:Animation, isComplete:Boolean, next:Animation, callback:String;
+				tween:Animation, isComplete:Boolean, next:Animation, callback:String, internalForce:Boolean;
 			if (time >= totalDur) {
 				_totalTime = _time = totalDur;
 				if (!_reversed) if (!_hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
 					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
-						force = true;
+						internalForce = true;
 					}
 				}
 				_rawPrevTime = time;
-				time = totalDur + 0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = totalDur + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else if (time <= 0) {
 				_totalTime = _time = 0;
@@ -1474,19 +1482,19 @@ myAnimation.seek("myLabel");
 				if (time < 0) {
 					_active = false;
 					if (_duration == 0) if (_rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						force = true;
+						internalForce = true;
 					}
 				} else if (!_initted) {
-					force = true;
+					internalForce = true;
 				}
 				_rawPrevTime = time;
-				time = -0.000001; //to avoid occassional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else {
 				_totalTime = _time = _rawPrevTime = time;
 			}
 			
-			if (_time == prevTime && !force) {
+			if (_time == prevTime && !force && !internalForce) {
 				return;
 			} else if (!_initted) {
 				_initted = true;

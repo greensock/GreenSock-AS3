@@ -40,6 +40,8 @@ package com.greensock.events {
 		public static const COMPLETE:String="complete";
 		/** Dispatched when the loader (or one of its children) receives an HTTP_STATUS event (see Adobe docs for specifics). **/
 		public static const HTTP_STATUS:String="httpStatus";
+		/** Dispatched when the loader (or one of its children) receives an HTTP_RESPONSE_STATUS event (see Adobe docs for specifics). **/
+		public static const HTTP_RESPONSE_STATUS:String="httpResponseStatus";
 		/** When script access is denied for a particular loader (like if an ImageLoader or SWFLoader tries loading from another domain and the crossdomain.xml file is missing or doesn't grant permission properly), a SCRIPT_ACCESS_DENIED LoaderEvent will be dispatched. **/
 		public static const SCRIPT_ACCESS_DENIED:String="scriptAccessDenied";
 		/** Dispatched when the loader (or one of its children) throws any error, like an IO_ERROR or SECURITY_ERROR. **/

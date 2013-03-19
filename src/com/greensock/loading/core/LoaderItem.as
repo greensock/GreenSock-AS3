@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.932
- * DATE: 2013-02-22
+ * VERSION: 1.935
+ * DATE: 2013-03-18
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -94,7 +94,7 @@ package com.greensock.loading.core {
 				}
 				request.data = data;
 			}
-			if (_isLocal && this.vars.allowMalformedURL != true && _request.data != null) {
+			if (_isLocal && this.vars.allowMalformedURL != true && _request.data != null && _request.url.substr(0, 4) != "http") {
 				_request.method = "POST"; //to avoid errors when loading local files with GET URL parameters
 			}
 		}
@@ -185,7 +185,7 @@ package com.greensock.loading.core {
 		/** @private **/
 		protected function _httpStatusHandler(event:Event):void {
 			_httpStatus = (event as Object).status;
-			dispatchEvent(new LoaderEvent(LoaderEvent.HTTP_STATUS, this, String(_httpStatus), event));
+			dispatchEvent(new LoaderEvent(event.type, this, String(_httpStatus), event));
 		}
 		
 		

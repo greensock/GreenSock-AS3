@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.3
- * DATE: 2013-03-01
+ * VERSION: 12.0.4
+ * DATE: 2013-03-12
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.3";
+		public static const version:String = "12.0.4";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -473,7 +473,8 @@ package com.greensock {
 				
 			} else {
 				_propLookup = {};
-				if (!(_siblings = _tweenLookup[target])) { //the next few lines accomplish the same thing as _siblings = _register(target, this, false) but faster and only slightly more verbose.
+				_siblings = _tweenLookup[target]
+				if (_siblings == null) { //the next few lines accomplish the same thing as _siblings = _register(target, this, false) but faster and only slightly more verbose.
 					_siblings = _tweenLookup[target] = [this];
 				} else {
 					_siblings[_siblings.length] = this;
@@ -493,15 +494,33 @@ package com.greensock {
 		 * Initializes the tween
 		 */
 		protected function _init():void {
+			var i:int, initPlugins:Boolean, pt:PropTween;
 			if (vars.startAt) {
 				vars.startAt.overwrite = 0;
 				vars.startAt.immediateRender = true;
 				_startAt = new TweenLite(target, 0, vars.startAt);
-				if (vars.immediateRender) { //tweens that render immediately (like most from() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in TimelineLite/Max instances where immediateRender was false (which is the default in the convenience methods like from()).
+				if (vars.immediateRender) {
+					_startAt = null; //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in TimelineLite/Max instances where immediateRender was false (which is the default in the convenience methods like from()).
+					if (_time === 0 && _duration !== 0) {
+						return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a TimelineLite or TimelineMax, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
+					}
+				}
+			} else if (vars.runBackwards && vars.immediateRender && _duration !== 0) {
+				//from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
+				if (_time === 0) {
+					vars.overwrite = vars.delay = 0;
+					vars.runBackwards = false;
+					_startAt = new TweenLite(target, 0, vars);
+					vars.overwrite = _overwrite;
+					vars.runBackwards = true;
+					vars.delay = _delay;
+					return;
+				} else if (_startAt != null) {
+					_startAt.render(-1, true);
 					_startAt = null;
 				}
 			}
-			var i:int, initPlugins:Boolean, pt:PropTween;
+			
 			if (vars.ease is Ease) {
 				_ease = (vars.easeParams is Array) ? vars.ease.config.apply(vars.ease, vars.easeParams) : vars.ease;
 			} else if (typeof(vars.ease) === "function") {
@@ -550,12 +569,15 @@ package com.greensock {
 			}
 			for (p in vars) {
 				if (p in _reservedProps) {
-					if (p === "onStartParams" || p === "onUpdateParams" || p === "onCompleteParams" || p === "onReverseCompleteParams" || p === "onRepeatParams") if ((a = vars[p])) {
-						i = a.length;
-						while (--i > -1) {
-							if (a[i] === "{self}") {
-								a = vars[p] = a.concat(); //copy the array in case the user referenced the same array in multiple tweens/timelines (each {self} should be unique)
-								a[i] = this;
+					if (p === "onStartParams" || p === "onUpdateParams" || p === "onCompleteParams" || p === "onReverseCompleteParams" || p === "onRepeatParams") {
+						a = vars[p];
+						if (a != null) {
+							i = a.length;
+							while (--i > -1) {
+								if (a[i] === "{self}") {
+									a = vars[p] = a.concat(); //copy the array in case the user referenced the same array in multiple tweens/timelines (each {self} should be unique)
+									a[i] = this;
+								}
 							}
 						}
 					}
@@ -668,6 +690,9 @@ package com.greensock {
 				return;
 			} else if (!_initted) {
 				_init();
+				if (!_initted) { //immediateRender tweens typically won't initialize until the playhead advances (_time is greater than 0) in order to ensure that overwriting occurs properly.
+					return;
+				}
 				if (!isComplete && _time) { //_ease is initially set to defaultEase, so now that init() has run, _ease is set properly and we need to recalculate the ratio. Overall this is faster than using conditional logic earlier in the method to avoid having to set ratio twice because we only init() once but renderTime() gets called VERY frequently.
 					ratio = _ease.getRatio(_time / _duration);
 				}
@@ -759,7 +784,8 @@ package com.greensock {
 					killProps = vars || propLookup;
 					record = (vars != overwrittenProps && overwrittenProps != "all" && vars != propLookup && (vars == null || vars._tempKill != true)); //_tempKill is a super-secret way to delete a particular tweening property but NOT have it remembered as an official overwritten property (like in BezierPlugin)
 					for (p in killProps) {
-						if ((pt = propLookup[p])) {
+						pt = propLookup[p]
+						if (pt != null) {
 							if (pt.pg && pt.t._kill(killProps)) {
 								changed = true; //some plugins need to be notified so they can perform cleanup tasks first
 							}
@@ -933,6 +959,15 @@ TweenLite.from([mc1, mc2, mc3], 1.5, {alpha:0});
 		 * <p><strong>NOTE</strong>: Only put starting values in the <code>fromVars</code> parameter - all 
 		 * special properties for the tween (like onComplete, onUpdate, delay, etc.) belong in the <code>toVars</code> 
 		 * parameter. </p>
+		 * 
+		 * <p>By default, <code>immediateRender</code> is <code>true</code> in 
+		 * <code>fromTo()</code> tweens, meaning that they immediately render their starting state 
+		 * regardless of any delay that is specified. This is done for convenience because it is 
+		 * often the preferred behavior when setting things up on the screen to animate into place, but 
+		 * you can override this behavior by passing <code>immediateRender:false</code> in the 
+		 * <code>fromVars</code> or <code>toVars</code> parameter so that it will wait to render 
+		 * the starting values until the tween actually begins (often the desired behavior when inserting 
+		 * into TimelineLite or TimelineMax instances).</p>
 		 * 
 		 * <p>Since the <code>target</code> parameter can also be an array of objects, the following 
 		 * code will tween the x property of mc1, mc2, and mc3 from 0 to 100 simultaneously:</p>
@@ -1182,12 +1217,14 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 		 * 3) scrubs the siblings array of duplicate instances of the tween (typically only used when re-enabling a tween instance).
 		 **/
 		protected static function _register(target:Object, tween:TweenLite=null, scrub:Boolean=false):Array {
-			var a:Array, i:int;
-			if (!(a = _tweenLookup[target])) {
+			var a:Array = _tweenLookup[target], 
+				i:int;
+			if (a == null) {
 				a = _tweenLookup[target] = [];
 			}
 			if (tween) {
-				a[(i = a.length)] = tween;
+				i = a.length;
+				a[i] = tween;
 				if (scrub) {
 					while (--i > -1) {
 						if (a[i] === tween) {
@@ -1205,7 +1242,8 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 			if (mode == 1 || mode >= 4) {
 				var l:int = siblings.length;
 				for (i = 0; i < l; i++) {
-					if ((curTween = siblings[i]) != tween) {
+					curTween = siblings[i];
+					if (curTween != tween) {
 						if (!curTween._gc) if (curTween._enabled(false, false)) {
 							changed = true;
 						}
@@ -1219,7 +1257,8 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 			var startTime:Number = tween._startTime + 0.0000000001, overlaps:Array = [], oCount:int = 0, zeroDur:Boolean = (tween._duration == 0), globalStart:Number;
 			i = siblings.length;
 			while (--i > -1) {
-				if ((curTween = siblings[i]) === tween || curTween._gc || curTween._paused) {
+				curTween = siblings[i];
+				if (curTween === tween || curTween._gc || curTween._paused) {
 					//ignore
 				} else if (curTween._timeline != tween._timeline) {
 					globalStart = globalStart || _checkOverlap(tween, 0, zeroDur);
@@ -1266,7 +1305,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 				tl = tl._timeline;
 			}
 			t /= ts;
-			return (t > reference) ? t - reference : ((zeroDur && t == reference) || (!tween._initted && t - reference < 0.0000000002)) ? 0.0000000001 : ((t = t + tween.totalDuration() / tween._timeScale / ts) > reference) ? 0 : t - reference - 0.0000000001;
+			return (t > reference) ? t - reference : ((zeroDur && t == reference) || (!tween._initted && t - reference < 0.0000000002)) ? 0.0000000001 : ((t += tween.totalDuration() / tween._timeScale / ts) > reference) ? 0 : t - reference - 0.0000000001;
 		}
 		
 		
