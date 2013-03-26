@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.4
- * DATE: 2013-03-17
+ * VERSION: 12.0.5
+ * DATE: 2013-03-25
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.4";
+		public static const version:String = "12.0.5";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -803,14 +803,13 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				}
 				_rawPrevTime = time;
 				if (_yoyo && (_cycle & 1) != 0) {
-					_time = 0;
-					time = -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+					_time = time = 0;
 				} else {
 					_time = _duration;
 					time = _duration + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				}
 				
-			} else if (time <= 0) {
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				if (!_locked) {
 					_totalTime = _cycle = 0;
 				}
@@ -828,7 +827,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 					internalForce = true;
 				}
 				_rawPrevTime = time;
-				time = (_duration == 0) ? 0 : -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = 0;
 				
 			} else {
 				_time = _rawPrevTime = time;
@@ -917,7 +916,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				vars.onStart.apply(this, vars.onStartParams);
 			}
 			
-			if (_time > prevTime) {
+			if (_time >= prevTime) {
 				tween = _first;
 				while (tween) {
 					next = tween._next; //record it here because the value could change after rendering...

@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.4
- * DATE: 2013-03-19
+ * VERSION: 12.0.5
+ * DATE: 2013-03-25
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.4";
+		public static const version:String = "12.0.5";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -507,7 +507,10 @@ package com.greensock {
 				}
 			} else if (vars.runBackwards && vars.immediateRender && _duration !== 0) {
 				//from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
-				if (_time === 0) {
+				if (_startAt != null) {
+					_startAt.render(-1, true);
+					_startAt = null;
+				} else if (_time === 0) {
 					vars.overwrite = vars.delay = 0;
 					vars.runBackwards = false;
 					_startAt = new TweenLite(target, 0, vars);
@@ -515,9 +518,6 @@ package com.greensock {
 					vars.runBackwards = true;
 					vars.delay = _delay;
 					return;
-				} else if (_startAt != null) {
-					_startAt.render(-1, true);
-					_startAt = null;
 				}
 			}
 			
@@ -631,7 +631,7 @@ package com.greensock {
 					_rawPrevTime = time;
 				}
 				
-			} else if (time <= 0) {
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				_totalTime = _time = 0;
 				ratio = _ease._calcEnd ? _ease.getRatio(0) : 0;
 				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0)) {
@@ -706,7 +706,11 @@ package com.greensock {
 			}
 			if (prevTime == 0) {
 				if (_startAt != null) {
-					_startAt.render(time, suppressEvents, force);
+					if (time >= 0) {
+						_startAt.render(time, suppressEvents, force);
+					} else if (!callback) {
+						callback = "_dummyGS"; //if no callback is defined, use a dummy value just so that the condition at the end evaluates as true because _startAt should render AFTER the normal render loop when the time is negative. We could handle this in a more intuitive way, of course, but the render loop is the MOST important thing to optimize, so this technique allows us to avoid adding extra conditional logic in a high-frequency area.
+					}
 				}
 				if (vars.onStart) if (_time != 0 || _duration == 0) if (!suppressEvents) {
 					vars.onStart.apply(null, vars.onStartParams);

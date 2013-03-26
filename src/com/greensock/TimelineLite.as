@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.4
- * DATE: 2013-03-08
+ * VERSION: 12.0.5
+ * DATE: 2013-03-25
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.4";
+		public static const version:String = "12.0.5";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -1473,7 +1473,7 @@ myAnimation.seek("myLabel");
 				_rawPrevTime = time;
 				time = totalDur + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
-			} else if (time <= 0) {
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				_totalTime = _time = 0;
 				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0)) {
 					callback = "onReverseComplete";
@@ -1488,7 +1488,7 @@ myAnimation.seek("myLabel");
 					internalForce = true;
 				}
 				_rawPrevTime = time;
-				time = -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				//time = -0.0000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else {
 				_totalTime = _time = _rawPrevTime = time;
@@ -1503,7 +1503,7 @@ myAnimation.seek("myLabel");
 				vars.onStart.apply(null, vars.onStartParams);
 			}
 			
-			if (_time > prevTime) {
+			if (_time >= prevTime) {
 				tween = _first;
 				while (tween) {
 					next = tween._next; //record it here because the value could change after rendering...
