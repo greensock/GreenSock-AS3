@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.5
- * DATE: 2013-03-20
+ * VERSION: 12.0.6
+ * DATE: 2013-04-01
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -47,7 +47,7 @@ tl.add( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:String = "12.0.5";
+		public static const version:String = "12.0.6";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -986,7 +986,7 @@ myAnimation.reversed( !myAnimation.reversed() ); //toggles the orientation
 				_pauseTime = value ? raw : NaN;
 				_paused = value;
 				_active = (!value && _totalTime > 0 && _totalTime < _totalDuration);
-				if (!value && elapsed != 0) {
+				if (!value && elapsed != 0 && _duration !== 0) {
 					render(_time, true, true);
 				}
 			}
