@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.12
- * DATE: 2013-01-09
+ * VERSION: 12.13
+ * DATE: 2013-03-25
  * AS3 (AS2 and JavaScript versions also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -539,9 +539,9 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 					r1 = _r1[i];
 					r2 = _r2[i];
 					tl = ((r2 + r1) * curviness * 0.25) / (basic ? 0.5 : _r3[i] || 0.5);
-					m1 = p2 - (p2 - p1) * (basic ? curviness * 0.5 : tl / r1);
-					m2 = p2 + (p3 - p2) * (basic ? curviness * 0.5 : tl / r2);
-					mm = p2 - (m1 + (m2 - m1) * ((r1 * 3 / (r1 + r2)) + 0.5) / 4);
+					m1 = p2 - (p2 - p1) * (basic ? curviness * 0.5 : (r1 !== 0 ? tl / r1 : 0));
+					m2 = p2 + (p3 - p2) * (basic ? curviness * 0.5 : (r2 !== 0 ? tl / r2 : 0));
+					mm = p2 - (m1 + (((m2 - m1) * ((r1 * 3 / (r1 + r2)) + 0.5) / 4) || 0));
 				} else {
 					m1 = p2 - (p2 - p1) * curviness * 0.5;
 					m2 = p2 + (p3 - p2) * curviness * 0.5;
@@ -827,7 +827,7 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 					val = Math.atan2(y2 - y1, x2 - x1) * conv + add;
 					
 					if (func[p]) {
-						func[p].call(target, val);
+						target[p](val);
 					} else {
 						target[p] = val;
 					}
