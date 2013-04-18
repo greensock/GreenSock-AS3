@@ -1,11 +1,12 @@
 /**
- * VERSION: 12.01
- * DATE: 2012-06-25
+ * VERSION: 12.0.2
+ * DATE: 2013-04-09
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
 package com.greensock.plugins {
 	import com.greensock.TweenLite;
+	
 	import flash.display.MovieClip;
 /**
  * [AS3/AS2 only] Tweens a MovieClip forward to a particular frame number, wrapping it if/when it reaches the end
@@ -40,7 +41,7 @@ TweenLite.to(mc, 1, {frameForward:5});
 		/** @private **/
 		protected var _max:uint;
 		/** @private **/
-		protected var _target:MovieClip;
+		protected var _target:Object;
 		/** @private Allows FrameBackwardPlugin to extend this class and only use an extremely small amount of kb (because the functionality is combined here) **/
 		protected var _backward:Boolean;
 		
@@ -51,17 +52,14 @@ TweenLite.to(mc, 1, {frameForward:5});
 		
 		/** @private **/
 		override public function _onInitTween(target:Object, value:*, tween:TweenLite):Boolean {
-			if (!(target is MovieClip) || isNaN(value)) {
-				return false;
-			}
-			_target = target as MovieClip;
+			_target = target;
 			_start = _target.currentFrame;
 			_max = _target.totalFrames;
-			_change = (typeof(value) == "number") ? Number(value) - _start : Number(value);
+			_change = (typeof(value) === "number") ? Number(value) - _start : (typeof(value) === "string" && value.charAt(1) === "=") ? int(value.charAt(0) + "1") * Number(value.substr(2)) : Number(value) || 0;
 			if (!_backward && _change < 0) {
-				_change += _max;
+				_change = ((_change + (_max * 99999)) % _max) + ((_change / _max) | 0) * _max;
 			} else if (_backward && _change > 0) {
-				_change -= _max;
+				_change = ((_change - (_max * 99999)) % _max) - ((_change / _max) | 0) * _max;
 			}
 			return true;
 		}
@@ -74,7 +72,7 @@ TweenLite.to(mc, 1, {frameForward:5});
 			} else if (frame < 0) {
 				frame += _max;
 			}
-			frame = (frame + 0.5) >> 0;
+			frame = (frame + 0.5) | 0;
 			if (frame != _target.currentFrame) {
 				_target.gotoAndStop( frame );
 			}

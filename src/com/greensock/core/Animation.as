@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.6
- * DATE: 2013-04-01
+ * VERSION: 12.0.7
+ * DATE: 2013-04-18
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -47,7 +47,7 @@ tl.add( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:String = "12.0.6";
+		public static const version:String = "12.0.7";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -360,7 +360,7 @@ myAnimation.play(2, false);
 		public function restart(includeDelay:Boolean=false, suppressEvents:Boolean=true):* {
 			reversed(false);
 			paused(false);
-			return totalTime((includeDelay ? -_delay : 0), suppressEvents);
+			return totalTime((includeDelay ? -_delay : 0), suppressEvents, true);
 		}
 		
 		/**
@@ -789,6 +789,7 @@ myAnimation.time(2); //sets time, jumping to new value just like seek().
 		 * 
 		 * @param time Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining. Negative values will be interpreted from the <strong>END</strong> of the animation.
 		 * @param suppressEvents If <code>true</code>, no events or callbacks will be triggered when the playhead moves to the new position defined in the <code>time</code> parameter.
+		 * @param uncapped By default, the <code>time</code> will be capped at <code>totalDuration</code> and if a negative number is used, it will be measured from the END of the animation, but if <code>uncapped</code> is <code>true</code>, the <code>time</code> won't be adjusted at all (negatives will be allowed, as will values that exceed totalDuration).
 		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
 		 * 
 		 * @see #time()
@@ -797,19 +798,19 @@ myAnimation.time(2); //sets time, jumping to new value just like seek().
 		 * @see #reverse()
 		 * @see #pause()
 		 **/
-		public function totalTime(time:Number=NaN, suppressEvents:Boolean=false):* {
+		public function totalTime(time:Number=NaN, suppressEvents:Boolean=false, uncapped:Boolean=false):* {
 			if (!arguments.length) {
 				return _totalTime;
 			}
 			if (_timeline) {
-				if (time < 0) {
+				if (time < 0 && !uncapped) {
 					time += totalDuration();
 				}
 				if (_timeline.smoothChildTiming) {
 					if (_dirty) {
 						totalDuration();
 					}
-					if (time > _totalDuration) {
+					if (time > _totalDuration && !uncapped) {
 						time = _totalDuration;
 					}
 					
@@ -987,7 +988,7 @@ myAnimation.reversed( !myAnimation.reversed() ); //toggles the orientation
 				_paused = value;
 				_active = (!value && _totalTime > 0 && _totalTime < _totalDuration);
 				if (!value && elapsed != 0 && _duration !== 0) {
-					render(_time, true, true);
+					render(_totalTime, true, true);
 				}
 			}
 			if (_gc && !value) {

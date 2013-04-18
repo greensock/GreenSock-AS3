@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.5
- * DATE: 2013-03-25
+ * VERSION: 12.0.7
+ * DATE: 2013-04-18
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.5";
+		public static const version:String = "12.0.7";
 		
 		TweenPlugin.activate([
 			
@@ -1719,7 +1719,7 @@ TweenMax.killAll(false, false, true, false);
 				i:int = a.length;
 			while (--i > -1) {
 				tween = a[i];
-				isDC = (TweenLite(tween).target == tween.vars.onComplete);
+				isDC = (tween is TweenLite && TweenLite(tween).target == tween.vars.onComplete);
 				if (allTrue || (tween is SimpleTimeline) || (isDC && delayedCalls) || (tweens && !isDC)) {
 					tween.paused(pause);
 				}

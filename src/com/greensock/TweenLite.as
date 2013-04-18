@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.5
- * DATE: 2013-03-25
+ * VERSION: 12.0.7
+ * DATE: 2013-04-18
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.5";
+		public static const version:String = "12.0.7";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -494,7 +494,7 @@ package com.greensock {
 		 * Initializes the tween
 		 */
 		protected function _init():void {
-			var i:int, initPlugins:Boolean, pt:PropTween;
+			var i:int, initPlugins:Boolean, pt:PropTween, p:String, copy:Object;
 			if (vars.startAt) {
 				vars.startAt.overwrite = 0;
 				vars.startAt.immediateRender = true;
@@ -511,12 +511,14 @@ package com.greensock {
 					_startAt.render(-1, true);
 					_startAt = null;
 				} else if (_time === 0) {
-					vars.overwrite = vars.delay = 0;
-					vars.runBackwards = false;
-					_startAt = new TweenLite(target, 0, vars);
-					vars.overwrite = _overwrite;
-					vars.runBackwards = true;
-					vars.delay = _delay;
+					copy = {};
+					for (p in vars) { //copy props into a new object and skip any reserved props, otherwise onComplete or onUpdate or onStart could fire. We should, however, permit autoCSS to go through.
+						if (!(p in _reservedProps)) {
+							copy[p] = vars[p];
+						}
+					}
+					copy.overwrite = 0;
+					_startAt = TweenLite.to(target, 0, copy);
 					return;
 				}
 			}

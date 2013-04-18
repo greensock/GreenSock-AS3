@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.5
- * DATE: 2013-03-25
+ * VERSION: 12.0.6
+ * DATE: 2013-04-03
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.5";
+		public static const version:String = "12.0.6";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
