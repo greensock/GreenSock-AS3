@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.6
- * DATE: 2013-04-03
+ * VERSION: 12.0.8
+ * DATE: 2013-04-27
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.6";
+		public static const version:String = "12.0.8";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -1131,7 +1131,7 @@ tl.add(otherTimeline, "myLabel");
 tl.add([tween1, tween2, tween3], "myLabel+=2"); 
 
 //add an array of tweens so that they are sequenced one-after-the-other with 0.5 seconds inbetween them, starting 2 seconds after the end of the timeline
-tl.add([tween1, tween2, tween3], "+=2", "stagger", 0.5);
+tl.add([tween1, tween2, tween3], "+=2", "sequence", 0.5);
 </listing>
 		 * 
 		 * @param value The tween, timeline, callback, or label (or array of them) to add
@@ -1466,8 +1466,11 @@ myAnimation.seek("myLabel");
 				if (!_reversed) if (!_hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time && _first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
 						internalForce = true;
+						if (_rawPrevTime > 0) {
+							callback = "onReverseComplete";
+						}
 					}
 				}
 				_rawPrevTime = time;
@@ -1481,20 +1484,20 @@ myAnimation.seek("myLabel");
 				}
 				if (time < 0) {
 					_active = false;
-					if (_duration == 0) if (_rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
 				} else if (!_initted) {
 					internalForce = true;
 				}
 				_rawPrevTime = time;
-				//time = -0.0000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 				
 			} else {
 				_totalTime = _time = _rawPrevTime = time;
 			}
 			
-			if (_time == prevTime && !force && !internalForce) {
+			if ((_time == prevTime || !_first) && !force && !internalForce) {
 				return;
 			} else if (!_initted) {
 				_initted = true;

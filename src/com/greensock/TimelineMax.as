@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.6
- * DATE: 2013-04-03
+ * VERSION: 12.0.8
+ * DATE: 2013-04-27
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.6";
+		public static const version:String = "12.0.8";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -758,6 +758,9 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 		 * and it does not automatically resume after the tween completes. If you need to resume playback, 
 		 * you can always use an onComplete to call the <code>resume()</code> method.</p>
 		 * 
+		 * <p>Like all from-type methods in GSAP, <code>immediateRender</code> is <code>true</code> by default,
+		 * meaning the timeline will immediately jump to the "from" time/label unless you set <code>immediateRender:false</code></p>
+		 * 
 		 * @param fromPosition The beginning time in seconds (or frame if the timeline is frames-based) or label from which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
 		 * @param toPosition The destination time in seconds (or frame if the timeline is frames-based) or label to which the timeline should play. For example, <code>myTimeline.tweenTo(0, 5)</code> would play from 0 (the beginning) to the 5-second point whereas <code>myTimeline.tweenFromTo("myLabel1", "myLabel2")</code> would play from "myLabel1" to "myLabel2".
 		 * @param vars An optional vars object that will be passed to the TweenLite instance. This allows you to define an onComplete, ease, delay, or any other TweenLite special property. onInit is the only special property that is not available (<code>tweenFromTo()</code> sets it internally)
@@ -768,9 +771,11 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 		 */
 		public function tweenFromTo(fromPosition:*, toPosition:*, vars:Object=null):TweenLite {
 			vars = vars || {};
-			vars.startAt = {time:_parseTimeOrLabel(fromPosition)};
+			fromPosition = _parseTimeOrLabel(fromPosition);
+			vars.startAt = {onComplete:seek, onCompleteParams:[fromPosition]};
+			vars.immediateRender = (vars.immediateRender !== false);
 			var t:TweenLite = tweenTo(toPosition, vars);
-			return t.duration((Math.abs( t.vars.time - t.vars.startAt.time) / _timeScale) || 0.001) as TweenLite;
+			return t.duration((Math.abs( t.vars.time - fromPosition) / _timeScale) || 0.001) as TweenLite;
 		}
 		
 		
@@ -797,8 +802,11 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				if (!_reversed) if (!_hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time && _first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
 						internalForce = true;
+						if (_rawPrevTime > 0) {
+							callback = "onReverseComplete";
+						}
 					}
 				}
 				_rawPrevTime = time;
@@ -820,7 +828,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				}
 				if (time < 0) {
 					_active = false;
-					if (_duration == 0) if (_rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
 				} else if (!_initted) {
@@ -903,7 +911,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				_locked = false;
 			}
 			
-			if (_time == prevTime && !force && !internalForce) {
+			if ((_time == prevTime || !_first) && !force && !internalForce) {
 				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
 				}
