@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.8
- * DATE: 2013-04-27
+ * VERSION: 12.0.10
+ * DATE: 2013-05-16
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.8";
+		public static const version:String = "12.0.10";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -504,7 +504,7 @@ tl.to(mc, 1, {x:100}, "myLabel+=2");  //places it 2 seconds after "myLabel"
 		 * @see #remove()
 		 */
 		public function to(target:Object, duration:Number, vars:Object, position:*="+=0"):* {
-			return add( new TweenLite(target, duration, vars), position);
+			return duration ? add( new TweenLite(target, duration, vars), position) : set(target, vars, position);
 		}
 		
 		/**
@@ -646,7 +646,7 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel+=2");  //places it 2 seconds after "my
 		 * @see #remove()
 		 */
 		public function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object, position:*="+=0"):* {
-			return add(TweenLite.fromTo(target, duration, fromVars, toVars), position);
+			return duration ? add(TweenLite.fromTo(target, duration, fromVars, toVars), position) : set(target, toVars, position);
 		}
 		
 		/**
@@ -712,7 +712,7 @@ tl.staggerTo(myArray, 1, {x:100}, 0.25, "myLabel+=2");  //places 2 seconds after
 				if (vars.startAt != null) {
 					vars.startAt = _copy(vars.startAt);
 				}
-				tl.add( new TweenLite(targets[i], duration, _copy(vars)), i * stagger);
+				tl.to(targets[i], duration, _copy(vars), i * stagger);
 			}
 			return add(tl, position);
 		}
