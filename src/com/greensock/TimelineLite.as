@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.10
- * DATE: 2013-05-16
+ * VERSION: 12.0.11
+ * DATE: 2013-06-05
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.10";
+		public static const version:String = "12.0.11";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -504,7 +504,7 @@ tl.to(mc, 1, {x:100}, "myLabel+=2");  //places it 2 seconds after "myLabel"
 		 * @see #remove()
 		 */
 		public function to(target:Object, duration:Number, vars:Object, position:*="+=0"):* {
-			return duration ? add( new TweenLite(target, duration, vars), position) : set(target, vars, position);
+			return duration ? add( new TweenLite(target, duration, vars), position) : this.set(target, vars, position);
 		}
 		
 		/**
@@ -646,7 +646,7 @@ tl.fromTo(mc, 1, {x:0}, {x:100}, "myLabel+=2");  //places it 2 seconds after "my
 		 * @see #remove()
 		 */
 		public function fromTo(target:Object, duration:Number, fromVars:Object, toVars:Object, position:*="+=0"):* {
-			return duration ? add(TweenLite.fromTo(target, duration, fromVars, toVars), position) : set(target, toVars, position);
+			return duration ? add(TweenLite.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
 		}
 		
 		/**
@@ -1215,6 +1215,18 @@ tl.add([tween1, tween2, tween3], "+=2", "sequence", 0.5);
 				return removeLabel(String(value));
 			}
 			return kill(null, value);
+		}
+		
+		/** @private **/
+		override public function _remove(tween:Animation, skipDisable:Boolean=false):* {
+			super._remove(tween, skipDisable);
+			if (_last == null) {
+				_time = _totalTime = 0;
+			} else if (_time > _last._startTime) {
+				_time = duration();
+				_totalTime = _totalDuration;
+			}
+			return this;
 		}
 		
 		/**

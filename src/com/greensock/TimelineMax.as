@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.10
- * DATE: 2013-05-16
+ * VERSION: 12.0.11
+ * DATE: 2013-06-05
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.10";
+		public static const version:String = "12.0.11";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -650,15 +650,17 @@ tl.add(nested);
 		 * @see #kill()
 		 */
 		public function removeCallback(callback:Function, position:*=null):TimelineMax {
-			if (position == null) {
-				_kill(null, callback);
-			} else {
-				var a:Array = getTweensOf(callback, false),
-					i:int = a.length,
-					time:Number = _parseTimeOrLabel(position);
-				while (--i > -1) {
-					if (a[i]._startTime === time) {
-						a[i]._enabled(false, false);
+			if (callback != null) {
+				if (position == null) {
+					_kill(null, callback);
+				} else {
+					var a:Array = getTweensOf(callback, false),
+						i:int = a.length,
+						time:Number = _parseTimeOrLabel(position);
+					while (--i > -1) {
+						if (a[i]._startTime === time) {
+							a[i]._enabled(false, false);
+						}
 					}
 				}
 			}
@@ -904,11 +906,14 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 					prevTime = (backwards) ? _duration + 0.000001 : -0.000001;
 					render(prevTime, true, false);
 				}
+				_locked = false;
+				if (_paused && !prevPaused) { //if the render() triggered callback that paused this timeline, we should abort (very rare, but possible)
+					return;
+				}
 				_time = recTime;
 				_totalTime = recTotalTime;
 				_cycle = recCycle;
 				_rawPrevTime = recRawPrevTime;
-				_locked = false;
 			}
 			
 			if ((_time == prevTime || !_first) && !force && !internalForce) {
@@ -920,8 +925,13 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				_initted = true;
 			}
 			
-			if (prevTotalTime == 0) if (vars.onStart) if (_totalTime != 0) if (!suppressEvents) {
-				vars.onStart.apply(this, vars.onStartParams);
+			if (prevTotalTime == 0) if (_totalTime != 0) if (!suppressEvents) {
+				if (vars.onStart) {
+					vars.onStart.apply(this, vars.onStartParams);
+				}
+				if (_dispatcher) {
+					_dispatcher.dispatchEvent(new TweenEvent(TweenEvent.START));
+				}
 			}
 			
 			if (_time >= prevTime) {

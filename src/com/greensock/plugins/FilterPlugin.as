@@ -1,12 +1,13 @@
 /**
- * VERSION: 12.0
- * DATE: 2012-01-12
+ * VERSION: 12.0.1
+ * DATE: 2013-05-21
  * AS3 
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
 package com.greensock.plugins {
 	import com.greensock.TweenLite;
 	import flash.filters.BitmapFilter;
+	import flash.filters.BlurFilter;
 /**
  * @private
  * Base class for all filter plugins (like blurFilter, colorMatrixFilter, glowFilter, etc.). Handles common routines. 
@@ -49,10 +50,20 @@ package com.greensock.plugins {
 				_index = extras.index;
 			} else {
 				_index = filters.length;
-				while (--_index > -1 && !(filters[_index] is _type)) { };
+				if (extras.addFilter != true) {
+					while (--_index > -1 && !(filters[_index] is _type)) { };
+				}
 			}
-			if (_index < 0 || filters[_index] == null || extras.addFilter == true) {
-				_index = filters.length;
+			if (_index < 0 || !(filters[_index] is _type)) {
+				if (_index < 0) {
+					_index = filters.length;
+				}
+				if (_index > filters.length) { //in case the requested index is too high, pad the lower elements with BlurFilters that have a blur of 0. 
+					i = filters.length - 1;
+					while (++i < _index) {
+						filters[i] = new BlurFilter(0, 0, 1);
+					}
+				}
 				filters[_index] = defaultFilter;
 				_target.filters = filters;
 			}
