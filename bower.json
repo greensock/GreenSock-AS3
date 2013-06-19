@@ -1,0 +1,13 @@
+{
+    "name": "gsap",
+    "version": "12.0.11",
+    "description": "GreenSock Animation Platform (GSAP) is a suite of high-performance AS3 classes for scripted animation (also available in JavaScript and AS2), including TweenLite, TweenMax, TimelineLite, TimelineMax, various easing equations, and plugins for things like animating along Bezier paths, filters, etc. See http://www.greensock.com/ for details.",
+    "author": {
+        "name": "Jack Doyle",
+        "url": "http://www.greensock.com/"
+    },
+    "main": "./src/com/greensock/TweenMax.as",
+    "dependencies": {
+
+    }
+}
