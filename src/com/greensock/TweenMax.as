@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.11
- * DATE: 2013-06-05
+ * VERSION: 12.0.12
+ * DATE: 2013-07-03
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.11";
+		public static const version:String = "12.0.12";
 		
 		TweenPlugin.activate([
 			
@@ -973,8 +973,8 @@ tween.updateTo({x:300, y:0}, false);
 					ratio = _ease.getRatio((_time === 0) ? 0 : 1);
 				}
 			}
-			if (!_active) if (!_paused) {
-				_active = true; //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
+			if (!_active) if (!_paused && _time !== prevTime && time >= 0) {
+				_active = true;  //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 			}
 			if (prevTotalTime == 0) {
 				if (_startAt != null) {

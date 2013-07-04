@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.11
- * DATE: 2013-06-05
+ * VERSION: 12.0.12
+ * DATE: 2013-07-03
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -361,7 +361,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.11";
+		public static const version:String = "12.0.12";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -786,7 +786,6 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 			if (_gc) {
 				_enabled(true, false);
 			}
-			_active = !_paused;
 			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(), 
 				prevTime:Number = _time, 
 				prevTotalTime:Number = _totalTime, 
@@ -923,6 +922,10 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				return;
 			} else if (!_initted) {
 				_initted = true;
+			}
+			
+			if (!_active) if (!_paused && _totalTime !== prevTotalTime && time > 0) {
+				_active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
 			}
 			
 			if (prevTotalTime == 0) if (_totalTime != 0) if (!suppressEvents) {

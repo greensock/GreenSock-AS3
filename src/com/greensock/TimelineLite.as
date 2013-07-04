@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.11
- * DATE: 2013-06-05
+ * VERSION: 12.0.12
+ * DATE: 2013-07-03
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.11";
+		public static const version:String = "12.0.12";
 		/** @private **/
 		protected static const _paramProps:Array = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"];
 		
@@ -990,6 +990,55 @@ tl.set(mc, {x:100}, "myLabel+=2");  //places it 2 seconds after "myLabel"
 			return add( new TweenLite(target, 0, vars), position);
 		}
 		
+		/**
+		 * Inserts a special callback that pauses playback of the timeline at a
+		 * particular time or label. This method is more accurate than using a simple callback of your own because 
+		 * it ensures that even if the virtual playhead had moved slightly beyond the pause position, it'll get moved
+		 * back to precisely the correct position. 
+		 * 
+		 * <p>Remember, the virtual playhead moves to a new position on each tick (frame) of the core timing mechanism, 
+		 * so it is possible, for example for it to be at 0.99 and then the next render happens at 1.01, so if your
+		 * callback was at exactly 1 second, the playhead would (in this example) move slightly past where you wanted to
+		 * pause. Then, if you reverse(), it would run into that callback again and get paused almost immediately. However, 
+		 * if you use the <code>addPause()</code> method, it will calibrate things so that when the callback is 
+		 * hit, it'll move the playhead back to <strong>EXACTLY</strong> where it should be. Thus, if you reverse()
+		 * it won't run into the same callback again.</p>
+		 * 
+		 * <listing version="3.0">
+//insert a pause at exactly 2 seconds into the timeline
+timeline.addPause(2);
+ 
+//insert a pause at "yourLabel"
+timeline.addPause("yourLabel");
+ 
+//insert a pause 3 seconds after "yourLabel" and when that pause occurs, call yourFunction
+timeline.addPause("yourLabel+=3", yourFunction);
+ 
+//insert a pause at exactly 4 seconds and then call yourFunction and pass it 2 parameters, "param1" and "param2"
+timeline.addPause(4, yourFunction, ["param1", "param2"]);
+</listing>
+		 * 
+		 * <p>The special callback is just a zero-duration tween that utilizes an onComplete, so technically 
+		 * this callback is just like any other, and it is considered a child of the timeline.</p>
+		 * 
+		 * @param position Controls the placement of the pause in the timeline (by default, it's the end of the timeline, like "+=0"). Use a number to indicate an absolute time in terms of seconds (or frames for frames-based timelines), or you can use a string with a "+=" or "-=" prefix to offset the insertion point relative to the END of the timeline. For example, <code>"+=2"</code> would place the tween 2 seconds after the end, leaving a 2-second gap. <code>"-=2"</code> would create a 2-second overlap. You may also use a label like <code>"myLabel"</code> to have the tween inserted exactly at the label or combine a label and a relative offset like <code>"myLabel+=2"</code> to insert the tween 2 seconds after "myLabel" or <code>"myLabel-=3"</code> to insert it 3 seconds before "myLabel". If you define a label that doesn't exist yet, it will <strong>automatically be added to the end of the timeline</strong> before inserting the tween there which can be quite convenient.
+		 * @param callback An optional callback that should be called immediately after the timeline is paused.
+		 * @param params An optional array of parameters to pass the callback. 
+		 * @return self (makes chaining easier)
+		 * @see #call()
+		 */
+		public function addPause(position:*="+=0", callback:Function=null, params:Array=null):* {
+			return call(_pauseCallback, ["{self}", callback, params], position);
+		}
+		
+		/** @private **/
+		protected function _pauseCallback(tween:TweenLite, callback:Function=null, params:Array=null):void {
+			pause(tween._startTime);
+			if (callback != null) {
+				callback.apply(null, params);
+			}
+		}
+		
 		/** @private **/
 		protected static function _prepVars(vars:Object):Object { //to accommodate TweenLiteVars and TweenMaxVars instances for strong data typing and code hinting
 			return (vars._isGSVars) ? vars.vars : vars;
@@ -1464,8 +1513,6 @@ myAnimation.seek("myLabel");
 		override public function render(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
 			if (_gc) {
 				_enabled(true, false);
-			} else if (!_active && !_paused) {
-				_active = true; 
 			}
 			var totalDur:Number = (!_dirty) ? _totalDuration : totalDuration(), 
 				prevTime:Number = _time, 
@@ -1513,6 +1560,9 @@ myAnimation.seek("myLabel");
 				return;
 			} else if (!_initted) {
 				_initted = true;
+			}
+			if (!_active) if (!_paused && _time !== prevTime && time > 0) {
+				_active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
 			}
 			if (prevTime == 0) if (vars.onStart) if (_time != 0) if (!suppressEvents) {
 				vars.onStart.apply(null, vars.onStartParams);

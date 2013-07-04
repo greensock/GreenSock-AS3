@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.11
- * DATE: 2013-06-05
+ * VERSION: 12.0.12
+ * DATE: 2013-07-03
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.11";
+		public static const version:String = "12.0.12";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -709,7 +709,7 @@ package com.greensock {
 				}
 			}
 			
-			if (!_active) if (!_paused) {
+			if (!_active) if (!_paused && _time !== prevTime && time >= 0) {
 				_active = true;  //so that if the user renders a tween (as opposed to the timeline rendering it), the timeline is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the tween already finished but the user manually re-renders it as halfway done.
 			}
 			if (prevTime == 0) {
