@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.7
- * DATE: 2013-04-18
+ * VERSION: 12.0.13
+ * DATE: 2013-07-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -47,7 +47,7 @@ tl.add( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:String = "12.0.7";
+		public static const version:String = "12.0.13";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -474,6 +474,7 @@ myAnimation.play(2, false);
 					_timeline._remove(this, true);
 				}
 			}
+			
 			return false;
 		}
 		
@@ -548,6 +549,18 @@ myAnimation.play(2, false);
 			ticker.dispatchEvent(_tickEvent);
 		}
 		
+		/** @private **/
+		protected function _swapSelfInParams(params:Array):Array {
+			var i:int = params.length,
+				copy:Array = params.concat();
+			while (--i > -1) {
+				if (params[i] === "{self}") {
+					copy[i] = this;
+				}
+			}
+			return copy;
+		}
+		
 		
 //---- GETTERS / SETTERS ------------------------------------------------------------
 		
@@ -612,16 +625,7 @@ myAnimation.eventCallback("onComplete", myFunction); //sets the onComplete
 					delete vars[type];
 				} else {
 					vars[type] = callback;
-					vars[type + "Params"] = params;
-					if (params) {
-						var i:int = params.length;
-						while (--i > -1) {
-							if (params[i] == "{self}") {
-								params = vars[type + "Params"] = params.concat(); //copying the array avoids situations where the same array is passed to multiple tweens/timelines and {self} doesn't correctly point to each individual instance.
-								params[i] = this;
-							}
-						}
-					}
+					vars[type + "Params"] = ((params is Array) && params.join("").indexOf("{self}") !== -1) ? _swapSelfInParams(params) : params;
 				}
 				if (type == "onUpdate") {
 					_onUpdate = callback;
@@ -813,16 +817,17 @@ myAnimation.time(2); //sets time, jumping to new value just like seek().
 					if (time > _totalDuration && !uncapped) {
 						time = _totalDuration;
 					}
-					
-					_startTime = (_paused ? _pauseTime : _timeline._time) - ((!_reversed ? time : _totalDuration - time) / _timeScale);
+					var tl:SimpleTimeline = _timeline;
+					_startTime = (_paused ? _pauseTime : tl._time) - ((!_reversed ? time : _totalDuration - time) / _timeScale);
 					if (!_timeline._dirty) { //for performance improvement. If the parent's cache is already dirty, it already took care of marking the anscestors as dirty too, so skip the function call here.
 						_uncache(false);
 					}
-					if (!_timeline._active) {
-						//in case any of the anscestors had completed but should now be enabled...
-						var tl:SimpleTimeline = _timeline;
+					//in case any of the ancestor timelines had completed but should now be enabled, we should reset their totalTime() which will also ensure that they're lined up properly and enabled. Skip for animations that are on the root (wasteful). Example: a TimelineLite.exportRoot() is performed when there's a paused tween on the root, the export will not complete until that tween is unpaused, but imagine a child gets restarted later, after all [unpaused] tweens have completed. The startTime of that child would get pushed out, but one of the ancestors may have completed.
+					if (tl._timeline != null) { 
 						while (tl._timeline) {
-							tl.totalTime(tl._totalTime, true);
+							if (tl._timeline._time !== (tl._startTime + tl._totalTime) / tl._timeScale) {
+								tl.totalTime(tl._totalTime, true);
+							}
 							tl = tl._timeline;
 						}
 					}
@@ -988,7 +993,7 @@ myAnimation.reversed( !myAnimation.reversed() ); //toggles the orientation
 				_paused = value;
 				_active = (!value && _totalTime > 0 && _totalTime < _totalDuration);
 				if (!value && elapsed != 0 && _duration !== 0) {
-					render(_totalTime, true, true);
+					render((_timeline.smoothChildTiming ? _totalTime : (raw - _startTime) / _timeScale), true, true); //in case the target's properties changed via some other tween or manual update by the user, we should force a render.
 				}
 			}
 			if (_gc && !value) {

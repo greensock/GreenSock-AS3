@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.0
- * DATE: 2013-01-21
+ * VERSION: 12.0.13
+ * DATE: 2013-07-10
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -88,7 +88,7 @@ package com.greensock.plugins {
  */
 	public class TweenPlugin {
 		/** @private **/
-		public static const version:String = "12.0.0";
+		public static const version:String = "12.0.13";
 		
 		/** @private If the API/Framework for plugins changes in the future, this number helps determine compatibility **/
 		public static const API:Number = 2; 
@@ -151,13 +151,16 @@ package com.greensock.plugins {
 		 * @param end End value (can be either numeric or a string value. If it's a string, it will be interpreted as relative to the starting value)
 		 * @param overwriteProp Name of the property that should be associated with the tween for overwriting purposes. Normally, it's the same as propName, but not always. For example, you may tween the "setRatio" property of a VisiblePlugin, but the property that it's actually controling in the end is "visible", so if a new overlapping tween of the target object is created that affects its "visible" property, this allows the plugin to kill the appropriate tween(s) when _kill() is called.
 		 * @param round If <code>true</code>, the property should be rounded to the closest integer whenever updated 
+		 * @return If a PropTween is created (which means a tween was required between the provided start and end values), that PropTween is returned. Otherwise, null is returned. 
 		 */
-		protected function _addTween(target:Object, propName:String, start:Number, end:*, overwriteProp:String=null, round:Boolean=false):void {
+		protected function _addTween(target:Object, propName:String, start:Number, end:*, overwriteProp:String=null, round:Boolean=false):PropTween {
 			var c:Number;
 			if (end != null && (c = (typeof(end) === "number" || end.charAt(1) !== "=") ? Number(end) - start : int(end.charAt(0)+"1") * Number(end.substr(2)))) {
 				_firstPT = new PropTween(target, propName, start, c, overwriteProp || propName, false, _firstPT);
 				_firstPT.r = round;
+				return _firstPT;
 			}
+			return null;
 		}
 		
 		/**
@@ -175,7 +178,7 @@ package com.greensock.plugins {
 			while (pt) {
 				val = pt.c * v + pt.s;
 				if (pt.r) {
-					val = (val > 0) ? (val + 0.5) >> 0 : (val - 0.5) >> 0; //about 4x faster than Math.round()
+					val = (val + ((val > 0) ? 0.5 : -0.5)) | 0; //about 4x faster than Math.round()
 				}
 				if (pt.f) {
 					pt.t[pt.p](val);

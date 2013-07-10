@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.936
- * DATE: 2013-05-11
+ * VERSION: 1.937
+ * DATE: 2013-07-10
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -1218,6 +1218,14 @@ function cuePointHandler(event:LoaderEvent):void {
 		public function set volume(value:Number):void {
 			_sound.volume = _volume = value;
 			_ns.soundTransform = _sound;
+		}
+		
+		/** The soundTransform of the NetStream associated with the VideoLoader (this gets refreshed when the VideoLoader is unloaded or reloaded). **/
+		public function get soundTransform():SoundTransform {
+			return _sound;
+		}
+		public function set soundTransform(value:SoundTransform):void {
+			_ns.soundTransform = _sound = value;
 		}
 		
 		/** The time (in seconds) at which the virtual playhead is positioned on the video. For example, if the virtual playhead is currently at the 3-second position (3 seconds from the beginning), this value would be 3. **/

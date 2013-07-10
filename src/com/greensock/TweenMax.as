@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.12
- * DATE: 2013-07-03
+ * VERSION: 12.0.13
+ * DATE: 2013-07-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.12";
+		public static const version:String = "12.0.13";
 		
 		TweenPlugin.activate([
 			
@@ -1348,10 +1348,10 @@ TweenMax.staggerTo(textFields, 1, {y:"+150", ease:CubicIn.ease}, 0.2);
 				if (i == l - 1) if (onCompleteAll != null) {
 					copy.onComplete = function():void {
 						if (vars.onComplete) {
-							vars.onComplete.apply(null, vars.onCompleteParams);
+							vars.onComplete.apply(null, arguments);
 						}
 						onCompleteAll.apply(null, onCompleteAllParams);
-					}
+					};
 				}
 				a[i] = new TweenMax(targets[i], duration, copy);
 				delay += stagger;

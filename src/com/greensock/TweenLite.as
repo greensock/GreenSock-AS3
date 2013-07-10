@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.12
- * DATE: 2013-07-03
+ * VERSION: 12.0.13
+ * DATE: 2013-07-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.12";
+		public static const version:String = "12.0.13";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -565,26 +565,19 @@ package com.greensock {
 		
 		/** @private Loops through the <code>vars</code> properties, captures starting values, triggers overwriting if necessary, etc. **/
 		protected function _initProps(target:Object, propLookup:Object, siblings:Array, overwrittenProps:Object):Boolean {
-			var p:String, i:int, initPlugins:Boolean, plugin:Object, a:Array;
+			var vars = this.vars,
+				p:String, i:int, initPlugins:Boolean, plugin:Object, val:Object;
 			if (target == null) {
 				return false;
 			}
 			for (p in vars) {
+				val = vars[p];
 				if (p in _reservedProps) {
-					if (p === "onStartParams" || p === "onUpdateParams" || p === "onCompleteParams" || p === "onReverseCompleteParams" || p === "onRepeatParams") {
-						a = vars[p];
-						if (a != null) {
-							i = a.length;
-							while (--i > -1) {
-								if (a[i] === "{self}") {
-									a = vars[p] = a.concat(); //copy the array in case the user referenced the same array in multiple tweens/timelines (each {self} should be unique)
-									a[i] = this;
-								}
-							}
-						}
+					if (val is Array) if (val.join("").indexOf("{self}") !== -1) {
+						vars[p] = _swapSelfInParams(val as Array);
 					}
 					
-				} else if ((p in _plugins) && (plugin = new _plugins[p]())._onInitTween(target, vars[p], this)) {
+				} else if ((p in _plugins) && (plugin = new _plugins[p]())._onInitTween(target, val, this)) {
 					_firstPT = new PropTween(plugin, "setRatio", 0, 1, p, true, _firstPT, plugin._priority);
 					i = plugin._overwriteProps.length;
 					while (--i > -1) {
@@ -600,7 +593,7 @@ package com.greensock {
 				} else {
 					_firstPT = propLookup[p] = new PropTween(target, p, 0, 1, p, false, _firstPT);
 					_firstPT.s = (!_firstPT.f) ? Number(target[p]) : target[ ((p.indexOf("set") || !("get" + p.substr(3) in target)) ? p : "get" + p.substr(3)) ]();
-					_firstPT.c = (typeof(vars[p]) === "number") ? Number(vars[p]) - _firstPT.s : (typeof(vars[p]) === "string" && vars[p].charAt(1) === "=") ? int(vars[p].charAt(0)+"1") * Number(vars[p].substr(2)) : Number(vars[p]) || 0;				
+					_firstPT.c = (typeof(val) === "number") ? Number(val) - _firstPT.s : (typeof(val) === "string" && val.charAt(1) === "=") ? int(val.charAt(0)+"1") * Number(val.substr(2)) : Number(val) || 0;				
 				}
 			}
 			
