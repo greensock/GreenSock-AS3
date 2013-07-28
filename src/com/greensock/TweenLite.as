@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.13
- * DATE: 2013-07-10
+ * VERSION: 12.0.14
+ * DATE: 2013-07-27
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.13";
+		public static const version:String = "12.0.14";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -494,18 +494,23 @@ package com.greensock {
 		 * Initializes the tween
 		 */
 		protected function _init():void {
-			var i:int, initPlugins:Boolean, pt:PropTween, p:String, copy:Object;
+			var immediate:Boolean = vars.immediateRender,
+				i:int, initPlugins:Boolean, pt:PropTween, p:String, copy:Object;
 			if (vars.startAt) {
+				if (_startAt != null) {
+					_startAt.render(-1, true); //if we've run a startAt previously (when the tween instantiated), we should revert it so that the values re-instantiate correctly particularly for relative tweens. Without this, a TweenLite.fromTo(obj, 1, {x:"+=100"}, {x:"-=100"}), for example, would actually jump to +=200 because the startAt would run twice, doubling the relative change.
+				}
 				vars.startAt.overwrite = 0;
 				vars.startAt.immediateRender = true;
 				_startAt = new TweenLite(target, 0, vars.startAt);
-				if (vars.immediateRender) {
-					_startAt = null; //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in TimelineLite/Max instances where immediateRender was false (which is the default in the convenience methods like from()).
-					if (_time === 0 && _duration !== 0) {
+				if (immediate) {
+					if (_time > 0) {
+						_startAt = null; //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in TimelineLite/Max instances where immediateRender was false (which is the default in the convenience methods like from()).
+					} else if (_duration !== 0) {
 						return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a TimelineLite or TimelineMax, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
 					}
 				}
-			} else if (vars.runBackwards && vars.immediateRender && _duration !== 0) {
+			} else if (immediate && vars.runBackwards && _duration !== 0) {
 				//from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
 				if (_startAt != null) {
 					_startAt.render(-1, true);
@@ -593,7 +598,7 @@ package com.greensock {
 				} else {
 					_firstPT = propLookup[p] = new PropTween(target, p, 0, 1, p, false, _firstPT);
 					_firstPT.s = (!_firstPT.f) ? Number(target[p]) : target[ ((p.indexOf("set") || !("get" + p.substr(3) in target)) ? p : "get" + p.substr(3)) ]();
-					_firstPT.c = (typeof(val) === "number") ? Number(val) - _firstPT.s : (typeof(val) === "string" && val.charAt(1) === "=") ? int(val.charAt(0)+"1") * Number(val.substr(2)) : Number(val) || 0;				
+					_firstPT.c = (typeof(val) === "number") ? Number(val) - _firstPT.s : (typeof(val) === "string" && val.charAt(1) === "=") ? int(val.charAt(0)+"1") * Number(val.substr(2)) : Number(val) || 0;					
 				}
 			}
 			

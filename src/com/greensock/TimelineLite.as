@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.13
- * DATE: 2013-07-10
+ * VERSION: 12.0.14
+ * DATE: 2013-07-27
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -276,7 +276,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.13";
+		public static const version:String = "12.0.14";
 		
 		/** @private **/
 		protected var _labels:Object;
@@ -1367,7 +1367,7 @@ myTimeline.append(nested);
 		 * @param label The name of the label
 		 * @param position Controls the placement of the label in the timeline (by default, it's the end of the timeline, like "+=0"). Use a number to indicate an absolute time in terms of seconds (or frames for frames-based timelines), or you can use a string with a "+=" or "-=" prefix to offset the insertion point relative to the END of the timeline. For example, <code>"+=2"</code> would place the label 2 seconds after the end, leaving a 2-second gap. <code>"-=2"</code> would create a 2-second overlap. You may also use a label like <code>"myLabel"</code> to have the label inserted exactly at the label or combine a label and a relative offset like <code>"myLabel+=2"</code> to insert the label 2 seconds after "myLabel" or <code>"myLabel-=3"</code> to insert it 3 seconds before "myLabel". If you define a label that doesn't exist yet, it will <strong>automatically be added to the end of the timeline</strong> before inserting the label there which can be quite convenient.
 		 */
-		public function addLabel(label:String, position:*):* {
+		public function addLabel(label:String, position:*="+=0"):* {
 			_labels[label] = _parseTimeOrLabel(position);
 			return this;
 		}
@@ -1537,11 +1537,14 @@ myAnimation.seek("myLabel");
 					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
-				} else if (!_initted) {
-					internalForce = true;
+					_rawPrevTime = time;
+				} else {
+					_rawPrevTime = time;
+					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
+					if (!_initted) {
+						internalForce = true;
+					}
 				}
-				_rawPrevTime = time;
-				time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 				
 			} else {
 				_totalTime = _time = _rawPrevTime = time;

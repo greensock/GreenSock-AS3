@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.61
- * DATE: 2012-10-23
+ * VERSION: 0.62
+ * DATE: 2013-07-12
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -84,7 +84,7 @@ package com.greensock {
  **/
 	public class BlitMask extends Sprite {
 		/** @private **/
-		public static var version:Number = 0.61;
+		public static var version:Number = 0.62;
 		
 		// In order to conserve memory and improve performance, we create a few instances of Rectangles, Sprites, Points, Matrices, and Arrays and reuse them rather than creating new instances over and over.
 		/** @private **/
@@ -465,7 +465,7 @@ package com.greensock {
 		}
 		
 		/** @private **/
-		protected function _mouseEventPassthrough(event:MouseEvent):void {
+		protected function _mouseEventPassthrough(event:Event):void {
 			if (this.mouseEnabled && (!_bitmapMode || this.hitTestPoint(event.stageX, event.stageY, false))) {
 				dispatchEvent(event);
 			}
