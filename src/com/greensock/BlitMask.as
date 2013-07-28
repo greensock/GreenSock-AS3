@@ -466,7 +466,7 @@ package com.greensock {
 		
 		/** @private **/
 		protected function _mouseEventPassthrough(event:Event):void {
-			if (this.mouseEnabled && (!_bitmapMode || this.hitTestPoint(event.stageX, event.stageY, false))) {
+			if (this.mouseEnabled && (!_bitmapMode || (event is MouseEvent && this.hitTestPoint(MouseEvent(event).stageX, MouseEvent(event).stageY, false)))) {
 				dispatchEvent(event);
 			}
 		}
