@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.14
- * DATE: 2013-07-27
+ * VERSION: 12.0.15
+ * DATE: 2013-09-02
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.14";
+		public static const version:String = "12.0.15";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -570,7 +570,7 @@ package com.greensock {
 		
 		/** @private Loops through the <code>vars</code> properties, captures starting values, triggers overwriting if necessary, etc. **/
 		protected function _initProps(target:Object, propLookup:Object, siblings:Array, overwrittenProps:Object):Boolean {
-			var vars = this.vars,
+			var vars:Object = this.vars,
 				p:String, i:int, initPlugins:Boolean, plugin:Object, val:Object;
 			if (target == null) {
 				return false;

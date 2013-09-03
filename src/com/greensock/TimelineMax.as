@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.14
- * DATE: 2013-07-27
+ * VERSION: 12.0.15
+ * DATE: 2013-09-02
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -354,6 +354,33 @@ nested.to(mc2, 1, {x:200}));
 tl.add(nested);
 </listing>
  * 
+ * <strong>How do timelines work? What are the mechanics like?</strong>
+ * <p>Every animation (tween and timeline) is placed on a parent timeline (except the 2 root timelines - there's one for normal tweens and another for "useFrames" ones). 
+ * In a sense, they all have their own playheads (that's what its "time" refers to, or "totalTime" which is identical except that it includes repeats and repeatDelays) 
+ * but generally they're not independent because they're sitting on a timeline whose playhead moves. 
+ * When the parent's playhead moves to a new position, it updates the childrens' too. </p>
+ * 
+ * <p>When a timeline renders at a particular time, it loops through its children and says "okay, you should render as if your playhead is at ____" and if that child 
+ * is a timeline with children, it does the same to its children, right on down the line. </p>
+ * 
+ * <p>The only exception is when the tween/timeline is paused in which case its internal playhead acts like it's "locked". So in that case, 
+ * it's possible (likely in fact) that the child's playhead would <strong>not</strong> be synced with the parent's. 
+ * When you unpause it (<code>resume()</code>), it essentially picks it up and moves it so that its internal playhead 
+ * is synchronized with wherever the parent's playhead is at that moment, thus things play perfectly smoothly. 
+ * That is, unless the timeline's <code>smoothChildTiming</code> is to <code>false</code> in which case it won't move - 
+ * its <code>startTime</code> will remain locked to where it was. </p>
+ * 
+ * <p>So basically, when <code>smoothChildTiming</code> is <code>true</code>, the engine will rearrange things on 
+ * the fly to ensure the playheads line up so that playback is seamless and smooth. The same thing happens when you <code>reverse()</code>
+ * or alter the <code>timeScale</code>, etc. But sometimes you might not want that behavior - you prefer to have tight 
+ * control over exactly where your tweens line up in the timeline - that's when <code>smoothChildTiming:false</code> is handy.</p>
+ * 
+ * <p>One more example: let's say you've got a 10-second tween that's just sitting on the root timeline and you're 2-seconds into the tween. 
+ * Let's assume it started at exactly 0 on the root to make this easy, and then when it's at 2-seconds, you do <code>tween.seek(5)</code>. 
+ * The playhead of the root isn't affected - it keeps going exactly as it always did, but in order to make that tween jump to 5 seconds 
+ * and play appropriately, the tween's <code>startTime</code> gets changed to -3. That way, the tween's playhead and the root 
+ * playhead are perfectly aligned. </p>
+ * 
  * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
@@ -361,7 +388,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.14";
+		public static const version:String = "12.0.15";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/

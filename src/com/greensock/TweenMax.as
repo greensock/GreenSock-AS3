@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.14
- * DATE: 2013-07-29
+ * VERSION: 12.0.15
+ * DATE: 2013-09-02
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com 
  **/
@@ -530,7 +530,7 @@ package com.greensock {
  */
 	public class TweenMax extends TweenLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.14";
+		public static const version:String = "12.0.15";
 		
 		TweenPlugin.activate([
 			
