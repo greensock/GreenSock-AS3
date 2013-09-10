@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.15
- * DATE: 2013-09-02
+ * VERSION: 12.0.16
+ * DATE: 2013-09-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.15";
+		public static const version:String = "12.0.16";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -795,7 +795,7 @@ package com.greensock {
 				}
 				if (propLookup) {
 					killProps = vars || propLookup;
-					record = (vars != overwrittenProps && overwrittenProps != "all" && vars != propLookup && (vars == null || vars._tempKill != true)); //_tempKill is a super-secret way to delete a particular tweening property but NOT have it remembered as an official overwritten property (like in BezierPlugin)
+					record = (vars != overwrittenProps && overwrittenProps != "all" && vars != propLookup && (typeof(vars) != "object" || vars._tempKill != true)); //_tempKill is a super-secret way to delete a particular tweening property but NOT have it remembered as an official overwritten property (like in BezierPlugin)
 					for (p in killProps) {
 						pt = propLookup[p]
 						if (pt != null) {

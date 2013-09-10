@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.15
- * DATE: 2013-09-02
+ * VERSION: 12.0.16
+ * DATE: 2013-09-10
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -303,7 +303,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.15";
+		public static const version:String = "12.0.16";
 		
 		/** @private **/
 		protected var _labels:Object;
@@ -1290,7 +1290,7 @@ tl.add([tween1, tween2, tween3], "+=2", "sequence", 0.5);
 			super._remove(tween, skipDisable);
 			if (_last == null) {
 				_time = _totalTime = 0;
-			} else if (_time > _last._startTime) {
+			} else if (_time > _last._startTime + _last._totalDuration / _last._timeScale) {
 				_time = duration();
 				_totalTime = _totalDuration;
 			}
