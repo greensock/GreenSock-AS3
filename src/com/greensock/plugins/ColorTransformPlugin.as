@@ -1,6 +1,6 @@
 /**
  * VERSION: 12.0
- * DATE: 2012-01-12
+ * DATE: 2013-10-11
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -65,7 +65,11 @@ TweenLite.to(mc, 1, {colorTransform:{tint:0xFF0000, tintAmount:0.5}});
 			} else {
 				return false;
 			}
-			end.concat(start);
+			if (value is ColorTransform) {
+				end.concat(value);
+			} else {
+				end.concat(start);
+			}
 			for (var p:String in value) {
 				if (p == "tint" || p == "color") {
 					if (value[p] != null) {

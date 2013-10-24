@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.16
- * DATE: 2013-09-10
+ * VERSION: 12.1.0
+ * DATE: 2013-10-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.0.16";
+		public static const version:String = "12.1.0";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -510,12 +510,12 @@ package com.greensock {
 						return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a TimelineLite or TimelineMax, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
 					}
 				}
-			} else if (immediate && vars.runBackwards && _duration !== 0) {
+			} else if (vars.runBackwards && _duration !== 0) {
 				//from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
 				if (_startAt != null) {
 					_startAt.render(-1, true);
 					_startAt = null;
-				} else if (_time === 0) {
+				} else {
 					copy = {};
 					for (p in vars) { //copy props into a new object and skip any reserved props, otherwise onComplete or onUpdate or onStart could fire. We should, however, permit autoCSS to go through.
 						if (!(p in _reservedProps)) {
@@ -523,8 +523,13 @@ package com.greensock {
 						}
 					}
 					copy.overwrite = 0;
+					copy.data = "isFromStart"; //we tag the tween with as "isFromStart" so that if [inside a plugin] we need to only do something at the very END of a tween, we have a way of identifying this tween as merely the one that's setting the beginning values for a "from()" tween. For example, clearProps in HTML5's CSSPlugin should only get applied at the very END of a tween and without this tag, from(...{height:100, clearProps:"height", delay:1}) would wipe the height at the beginning of the tween and after 1 second, it'd kick back in.
 					_startAt = TweenLite.to(target, 0, copy);
-					return;
+					if (!immediate) {
+						_startAt.render(-1, true); //for tweens that aren't rendered immediately, we still need to use the _startAt to record the starting values so that we can revert to them if the parent timeline's playhead goes backward beyond the beginning, but we immediately revert the tween back otherwise the parent tween that's currently instantiating wouldn't see the wrong starting values (since they were changed by the _startAt tween) 
+					} else if (_time === 0) {
+						return;
+					}
 				}
 			}
 			
@@ -616,7 +621,7 @@ package com.greensock {
 		
 		/** @private (see Animation.render() for notes) **/
 		override public function render(time:Number, suppressEvents:Boolean=false, force:Boolean=false):void {
-			var isComplete:Boolean, callback:String, pt:PropTween, prevTime:Number = _time;
+			var isComplete:Boolean, callback:String, pt:PropTween, rawPrevTime:Number, prevTime:Number = _time;
 			if (time >= _duration) {
 				_totalTime = _time = _duration;
 				ratio = _ease._calcEnd ? _ease.getRatio(1) : 1;
@@ -625,22 +630,20 @@ package com.greensock {
 					callback = "onComplete";
 				}
 				if (_duration == 0) { //zero-duration tweens are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-					if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time) {
+					rawPrevTime = _rawPrevTime;
+					if (time === 0 || rawPrevTime < 0 || rawPrevTime === _tinyNum) if (rawPrevTime !== time) {
 						force = true;
-						if (_rawPrevTime > 0) {
+						if (rawPrevTime > _tinyNum) {
 							callback = "onReverseComplete";
-							if (suppressEvents) {
-								time = -1; //when a callback is placed at the VERY beginning of a timeline and it repeats (or if timeline.seek(0) is called), events are normally suppressed during those behaviors (repeat or seek()) and without adjusting the _rawPrevTime back slightly, the onComplete wouldn't get called on the next render. This only applies to zero-duration tweens/callbacks of course. 
-							}
 						}
 					}
-					_rawPrevTime = time;
+					_rawPrevTime = rawPrevTime = (!suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 				}
 				
 			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				_totalTime = _time = 0;
 				ratio = _ease._calcEnd ? _ease.getRatio(0) : 0;
-				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0)) {
+				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > _tinyNum)) {
 					callback = "onReverseComplete";
 					isComplete = _reversed;
 				}
@@ -650,9 +653,8 @@ package com.greensock {
 						if (_rawPrevTime >= 0) {
 							force = true;
 						}
-						_rawPrevTime = time;
+						_rawPrevTime = rawPrevTime = (!suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 					}
-					
 				} else if (!_initted) { //if we render the very beginning (time == 0) of a fromTo(), we must force the render (normal tweens wouldn't need to render at a time of 0 when the prevTime was also 0). This is also mandatory to make sure overwriting kicks in immediately.
 					force = true;
 				}
@@ -696,7 +698,7 @@ package com.greensock {
 				return;
 			} else if (!_initted) {
 				_init();
-				if (!_initted) { //immediateRender tweens typically won't initialize until the playhead advances (_time is greater than 0) in order to ensure that overwriting occurs properly.
+				if (!_initted || _gc) { //immediateRender tweens typically won't initialize until the playhead advances (_time is greater than 0) in order to ensure that overwriting occurs properly. Also, if all of the tweening properties have been overwritten (which would cause _gc to be true, as set in _init()), we shouldn't continue otherwise an onStart callback could be called for example. 
 					return;
 				}
 				//_ease is initially set to defaultEase, so now that init() has run, _ease is set properly and we need to recalculate the ratio. Overall this is faster than using conditional logic earlier in the method to avoid having to set ratio twice because we only init() once but renderTime() gets called VERY frequently.
@@ -734,7 +736,7 @@ package com.greensock {
 			}
 			
 			if (_onUpdate != null) {
-				if (time < 0 && _startAt != null) {
+				if (time < 0 && _startAt != null && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
 					_startAt.render(time, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
 				}
 				if (!suppressEvents) {
@@ -743,7 +745,8 @@ package com.greensock {
 			}
 			
 			if (callback) if (!_gc) { //check gc because there's a chance that kill() could be called in an onUpdate
-				if (time < 0 && _startAt != null && _onUpdate == null) {
+				
+				if (time < 0 && _startAt != null && _onUpdate == null && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
 					_startAt.render(time, suppressEvents, force);
 				}
 				if (isComplete) {
@@ -754,6 +757,9 @@ package com.greensock {
 				}
 				if (!suppressEvents) if (vars[callback]) {
 					vars[callback].apply(null, vars[callback + "Params"]);
+				}
+				if (_duration === 0 && _rawPrevTime !== rawPrevTime) { //the onComplete or onReverseComplete could trigger movement of the playhead and for zero-duration tweens (which must discern direction), we don't want to fire again on the next render. Think of several addPause()'s in a timeline that forces the playhead to a certain spot, but what if it's already paused and another tween is tweening the "time" of the timeline? Each time it moves [forward] past that spot, it would move back, and since suppressEvents is true, it'd reset _rawPrevTime to -1 so that when it begins again, the callback would fire properly (so ultimately it could bounce back and forth during that tween). Again, this is a very uncommon scenario, but possible nonetheless.
+					_rawPrevTime = 0;
 				}
 			}
 			
@@ -1115,12 +1121,18 @@ TweenLite.set([obj1, obj2, obj3], {x:100, y:50, alpha:0});
 		 * TweenLite.killTweensOf(myObject);
 		 * </code></p>
 		 * 
-		 * <p>To kill only particular tweening properties of the object, use the second parameter. 
+		 * <p>To kill only active (currently animating) tweens of <code>myObject</code>, you'd do this:</p>
+		 * 
+		 * <p><code>
+		 * TweenLite.killTweensOf(myObject, true);
+		 * </code></p>
+		 * 
+		 * <p>To kill only particular tweening properties of the object, use the third parameter. 
 		 * For example, if you only want to kill all the tweens of <code>myObject.alpha</code> and 
 		 * <code>myObject.x</code>, you'd do this:</p>
 		 * 
 		 * <p><code>
-		 * TweenLite.killTweensOf(myObject, {alpha:true, x:true});
+		 * TweenLite.killTweensOf(myObject, false, {alpha:true, x:true});
 		 * </code></p>
 		 * 
 		 * <p>To kill all the delayedCalls that were created like <code>TweenLite.delayedCall(5, myFunction);</code>, 
@@ -1133,13 +1145,19 @@ TweenLite.set([obj1, obj2, obj3], {x:100, y:50, alpha:0});
 		 * <code>TweenLite.killTweensOf(mc)</code> is called 2 seconds after the tween was created, 
 		 * it will still be killed even though it hasn't started yet. </p>
 		 * 
-		 * @param target Object whose tweens should be killed immediately
+		 * @param target Object whose tweens should be killed immediately or selector text to feed the selector engine to find the target(s).
+		 * @param onlyActive If <code>true</code>, only tweens that are currently active will be killed (a tween is considered "active" if the virtual playhead is actively moving across the tween and it is not paused, nor are any of its ancestor timelines paused). 
 		 * @param vars To kill only specific properties, use a generic object containing enumerable properties corresponding to the ones that should be killed like <code>{x:true, y:true}</code>. The values assigned to each property of the object don't matter - the sole purpose of the object is for iteration over the named properties (in this case, <code>x</code> and <code>y</code>). If no object (or <code>null</code>) is defined, all matched tweens will be killed in their entirety.
 		 **/
-		public static function killTweensOf(target:*, vars:Object=null):void {
-			var a:Array = getTweensOf(target), i:int = a.length;
+		public static function killTweensOf(target:*, onlyActive:*=false, vars:Object=null):void {
+			if (typeof(onlyActive) === "object") {
+				vars = onlyActive; //for backwards compatibility (before "onlyActive" parameter was inserted)
+				onlyActive = false;
+			}
+			var a:Array = TweenLite.getTweensOf(target, onlyActive),
+				i:int = a.length;
 			while (--i > -1) {
-				TweenLite(a[i])._kill(vars, target);
+				a[i]._kill(vars, target);
 			}
 		}
 		
@@ -1189,15 +1207,16 @@ var a1 = TweenLite.getTweensOf(myObject1); //finds 2 tweens
 var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 </listing>
 		 * @param target The target whose tweens should be returned, or an array of such targets
+		 * @param onlyActive If <code>true</code>, only tweens that are currently active will be returned (a tween is considered "active" if the virtual playhead is actively moving across the tween and it is not paused, nor are any of its ancestor timelines paused). 
 		 * @return An array of tweens
 		 **/
-		public static function getTweensOf(target:*):Array {
+		public static function getTweensOf(target:*, onlyActive:Boolean=false):Array {
 			var i:int, a:Array, j:int, t:TweenLite;
 			if (target is Array && typeof(target[0]) != "string" && typeof(target[0]) != "number") {
 				i = target.length;
 				a = [];
 				while (--i > -1) {
-					a = a.concat(getTweensOf(target[i]));
+					a = a.concat(getTweensOf(target[i], onlyActive));
 				}
 				i = a.length;
 				//now get rid of any duplicates (tweens of arrays of objects could cause duplicates)
@@ -1214,7 +1233,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 				a = _register(target).concat();
 				i = a.length;
 				while (--i > -1) {
-					if (a[i]._gc) {
+					if (a[i]._gc || (onlyActive && !a[i].isActive())) {
 						a.splice(i, 1);
 					}
 				}

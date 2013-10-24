@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.16
- * DATE: 2013-09-10
+ * VERSION: 12.1.0
+ * DATE: 2013-10-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -354,7 +354,7 @@ nested.to(mc2, 1, {x:200}));
 tl.add(nested);
 </listing>
  * 
- * <strong>How do timelines work? What are the mechanics like?</strong>
+ * <p><strong>How do timelines work? What are the mechanics like?</strong></p>
  * <p>Every animation (tween and timeline) is placed on a parent timeline (except the 2 root timelines - there's one for normal tweens and another for "useFrames" ones). 
  * In a sense, they all have their own playheads (that's what its "time" refers to, or "totalTime" which is identical except that it includes repeats and repeatDelays) 
  * but generally they're not independent because they're sitting on a timeline whose playhead moves. 
@@ -388,7 +388,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.0.16";
+		public static const version:String = "12.1.0";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -822,6 +822,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				prevPaused:Boolean = _paused, 
 				prevCycle:int = _cycle, 
 				tween:Animation, isComplete:Boolean, next:Animation, dur:Number, callback:String, internalForce:Boolean;
+
 			if (time >= totalDur) {
 				if (!_locked) {
 					_totalTime = totalDur;
@@ -830,14 +831,14 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				if (!_reversed) if (!_hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time && _first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+					if (_duration === 0) if (time === 0 || _rawPrevTime < 0 || _rawPrevTime === _tinyNum) if (_rawPrevTime !== time && _first != null) {
 						internalForce = true;
-						if (_rawPrevTime > 0) {
+						if (_rawPrevTime > _tinyNum) {
 							callback = "onReverseComplete";
 						}
 					}
 				}
-				_rawPrevTime = time;
+				_rawPrevTime = (_duration || !suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 				if (_yoyo && (_cycle & 1) != 0) {
 					_time = time = 0;
 				} else {
@@ -850,7 +851,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 					_totalTime = _cycle = 0;
 				}
 				_time = 0;
-				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0 && !_locked)) {
+				if (prevTime != 0 || (_duration == 0 && (_rawPrevTime > _tinyNum || (time < 0 && _rawPrevTime >= 0)) && !_locked)) {
 					callback = "onReverseComplete";
 					isComplete = _reversed;
 				}
@@ -859,9 +860,9 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
-					_rawPrevTime = time;
+					_rawPrevTime = time;			
 				} else {
-					_rawPrevTime = time;
+					_rawPrevTime = (_duration || !suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 					if (!_initted) {
 						internalForce = true;
@@ -869,6 +870,9 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				}
 				
 			} else {
+				if (_duration === 0 && _rawPrevTime < 0) { //without this, zero-duration repeating timelines (like with a simple callback nested at the very beginning and a repeatDelay) wouldn't render the first time through.
+					internalForce = true;
+				}
 				_time = _rawPrevTime = time;
 				if (!_locked) {
 					_totalTime = time;
@@ -944,7 +948,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				_cycle = recCycle;
 				_rawPrevTime = recRawPrevTime;
 			}
-			
+
 			if ((_time == prevTime || !_first) && !force && !internalForce) {
 				if (prevTotalTime !== _totalTime) if (_onUpdate != null) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 					_onUpdate.apply(vars.onUpdateScope || this, vars.onUpdateParams);
@@ -1258,6 +1262,7 @@ myTimeline.progress( 0.25 ); //sets progress to one quarter finished
 </listing>
 		 * 
 		 * @param value Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * @param suppressEvents If <code>true</code>, no events or callbacks will be triggered when the playhead moves to the new position.
 		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
 		 * 
 		 * @see #totalProgress()
@@ -1265,31 +1270,32 @@ myTimeline.progress( 0.25 ); //sets progress to one quarter finished
 		 * @see #time()
 		 * @see #totalTime()
 		 **/
-		override public function progress(value:Number=NaN):* {
-			return (!arguments.length) ? _time / duration() : totalTime( duration() * ((_yoyo && (_cycle & 1) !== 0) ? 1 - value : value) + (_cycle * (_duration + _repeatDelay)), false);
+		override public function progress(value:Number=NaN, suppressEvents:Boolean=false):* {
+			return (!arguments.length) ? _time / duration() : totalTime( duration() * ((_yoyo && (_cycle & 1) !== 0) ? 1 - value : value) + (_cycle * (_duration + _repeatDelay)), suppressEvents);
 		}
 		
 		/** 
-		 * Gets or sets the timeline's totalProgress which is a value between 0 and 1 indicating the position 
+		 * Gets or sets the timeline's total progress which is a value between 0 and 1 indicating the position 
 		 * of the virtual playhead (<strong>including</strong> repeats) where 0 is at the beginning, 0.5 is 
-		 * halfway complete, and 1 is complete. If the timeline has a non-zero <code>repeat</code> defined, 
-		 * <code>progress</code> and <code>totalProgress</code> will be different because <code>progress</code> 
-		 * doesn't include any repeats or repeatDelays whereas <code>totalProgress</code> does. For example, 
-		 * if a TimelineMax instance is set to repeat once, at the end of the first cycle <code>totalProgress</code> 
+		 * at the halfway point, and 1 is at the end (complete). If the timeline has a non-zero <code>repeat</code> defined, 
+		 * <code>progress()</code> and <code>totalProgress()</code> will be different because <code>progress()</code> 
+		 * doesn't include the <code>repeat</code> or <code>repeatDelay</code> whereas <code>totalProgress()</code> does. For example, 
+		 * if a TimelineMax instance is set to repeat once, at the end of the first cycle <code>totalProgress()</code> 
 		 * would only be 0.5 whereas <code>progress</code> would be 1. If you watched both properties over the 
 		 * course of the entire animation, you'd see <code>progress</code> go from 0 to 1 twice (once for 
-		 * each cycle) in the same time it takes the <code>totalProgress</code> to go from 0 to 1 once.
+		 * each cycle) in the same time it takes the <code>totalProgress()</code> to go from 0 to 1 once.
 		 * 
 		 * <p>This method serves as both a getter and setter. Omitting the parameter returns the current 
 		 * value (getter), whereas defining the parameter sets the value (setter) and returns the instance 
-		 * itself for easier chaining, like <code>myTimeline.totalProgress(0.5).play();</code></p>
+		 * itself for easier chaining, like <code>myAnimation.totalProgress(0.5).play();</code></p>
 		 * 
 		 * <listing version="3.0">
-var progress = myTimeline.totalProgress(); //gets total progress
-myTimeline.totalProgress( 0.25 ); //sets total progress to one quarter finished
-</listing>
+var progress = myAnimation.totalProgress(); //gets total progress
+myAnimation.totalProgress(0.25); //sets total progress to one quarter finished
+		 </listing>
 		 * 
 		 * @param value Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * @param suppressEvents If <code>true</code>, no events or callbacks will be triggered when the playhead moves to the new position.
 		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
 		 * 
 		 * @see #progress()
@@ -1297,8 +1303,8 @@ myTimeline.totalProgress( 0.25 ); //sets total progress to one quarter finished
 		 * @see #time()
 		 * @see #totalTime()
 		 **/
-		public function totalProgress(value:Number=NaN):* {
-			return (!arguments.length) ? _totalTime / totalDuration() : totalTime( totalDuration() * value, false);
+		override public function totalProgress(value:Number=NaN, suppressEvents:Boolean=true):* {
+			return (!arguments.length) ? _totalTime / totalDuration() : totalTime( totalDuration() * value, suppressEvents);
 		}
 		
 		/**

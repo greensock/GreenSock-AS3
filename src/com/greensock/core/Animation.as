@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.13
- * DATE: 2013-07-10
+ * VERSION: 12.1.0
+ * DATE: 2013-10-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -47,7 +47,7 @@ tl.add( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:String = "12.0.13";
+		public static const version:String = "12.1.0";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -124,6 +124,8 @@ Animation.ticker.removeEventListener("tick", myFunction);
 		protected static var _rootFrame:Number = -1;
 		/** @private We reuse this event instance for better memory management rather than recreating a new instance on every frame. **/
 		protected static var _tickEvent:Event = new Event("tick");
+		/** @private **/
+		protected static var _tinyNum:Number = 0.0000000001;
 		
 		/** @private The <code>onUpdate</code> callback (if one is defined). Checking an instance property is faster than looking it up in the vars object on every render. This is purely a speed optimization **/
 		protected var _onUpdate:Function;
@@ -453,6 +455,27 @@ myAnimation.play(2, false);
 		 **/
 		public function invalidate():* {
 			return this;
+		}
+		
+		/** 
+		 * Indicates whether or not the animation is currently active (meaning the virtual playhead is actively moving across 
+		 * this instance's time span and it is not paused, nor are any of its ancestor timelines).
+		 * So for example, if a tween is in the middle of tweening, it's active, but after it is finished (or before 
+		 * it begins), it is <strong>not</strong> active. If it is paused or if it is placed inside of a timeline that's paused
+		 * (or if any of its ancestor timelines are paused), <code>isActive()</code> will return <code>false</code>. If the
+		 * playhead is directly on top of the animation's start time (even if it hasn't rendered quite yet), that counts
+		 * as "active".
+		 * 
+		 * <p>You may also check the <code>progress()</code> or <code>totalProgress()</code>, but those don't take into consideration
+		 * the paused state or the position of the parent timeline's playhead.</p>
+		 * 
+		 * @see #progress()
+		 * @see #totalProgress()
+		 **/
+		public function isActive():Boolean {
+			var tl:SimpleTimeline = _timeline, //the 2 root timelines won't have a _timeline; they're always active.
+				rawTime:Number;
+			return ((tl == null) || (!_gc && !_paused && tl.isActive() && (rawTime = tl.rawTime()) >= _startTime && rawTime < _startTime + totalDuration() / _timeScale));
 		}
 		
 		/**
@@ -834,12 +857,78 @@ myAnimation.time(2); //sets time, jumping to new value just like seek().
 				}
 				if (_gc) {
 					_enabled(true, false);
-				}
-				if (_totalTime != time) {
+				}				
+				if (_totalTime != time || _duration === 0) {
 					render(time, suppressEvents, false);
 				}
 			}
 			return this;
+		}
+		
+		/** 
+		 * Gets or sets the animations's progress which is a value between 0 and 1 indicating the position 
+		 * of the virtual playhead (<strong>excluding</strong> repeats) where 0 is at the beginning, 0.5 is at the halfway point, 
+		 * and 1 is at the end (complete). If the animation has a non-zero <code>repeat</code> defined (only available in TweenMax and TimelineMax), 
+		 * <code>progress()</code> and <code>totalProgress()</code> will be different because <code>progress()</code> doesn't include the 
+		 * <code>repeat</code> or <code>repeatDelay</code> whereas <code>totalProgress()</code> does. For example, if a TimelineMax instance 
+		 * is set to repeat once, at the end of the first cycle <code>totalProgress()</code> would only be 0.5 
+		 * whereas <code>progress()</code> would be 1. If you watched both properties over the course of the entire 
+		 * animation, you'd see <code>progress()</code> go from 0 to 1 twice (once for each cycle) in the 
+		 * same time it takes the <code>totalProgress()</code> to go from 0 to 1 once.
+		 * 
+		 * <p>This method serves as both a getter and setter. Omitting the parameter returns the current 
+		 * value (getter), whereas defining the parameter sets the value (setter) and returns the instance 
+		 * itself for easier chaining, like <code>myAnimation.progress(0.5).play();</code></p>
+		 * 
+		 * <listing version="3.0">
+var progress = myAnimation.progress(); //gets current progress
+myAnimation.progress(0.25); //sets progress to one quarter finished
+		 </listing>
+		 * 
+		 * @param value Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * @param suppressEvents If <code>true</code>, no events or callbacks will be triggered when the playhead moves to the new position.
+		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * 
+		 * @see #seek()
+		 * @see #time()
+		 * @see #totalTime()
+		 * @see #totalProgress()
+		 **/
+		public function progress(value:Number=NaN, suppressEvents:Boolean=false):* {
+			return (!arguments.length) ? _time / duration() : totalTime(duration() * value, suppressEvents);
+		}
+		
+		/** 
+		 * Gets or sets the animation's total progress which is a value between 0 and 1 indicating the position 
+		 * of the virtual playhead (<strong>including</strong> repeats) where 0 is at the beginning, 0.5 is 
+		 * at the halfway point, and 1 is at the end (complete). If the animation has a non-zero <code>repeat</code> defined  (only available in TweenMax and TimelineMax), 
+		 * <code>progress()</code> and <code>totalProgress()</code> will be different because <code>progress()</code> 
+		 * doesn't include the <code>repeat</code> or <code>repeatDelay</code> whereas <code>totalProgress()</code> does. For example, 
+		 * if a TimelineMax instance is set to repeat once, at the end of the first cycle <code>totalProgress()</code> 
+		 * would only be 0.5 whereas <code>progress</code> would be 1. If you watched both properties over the 
+		 * course of the entire animation, you'd see <code>progress</code> go from 0 to 1 twice (once for 
+		 * each cycle) in the same time it takes the <code>totalProgress()</code> to go from 0 to 1 once.
+		 * 
+		 * <p>This method serves as both a getter and setter. Omitting the parameter returns the current 
+		 * value (getter), whereas defining the parameter sets the value (setter) and returns the instance 
+		 * itself for easier chaining, like <code>myAnimation.totalProgress(0.5).play();</code></p>
+		 * 
+		 * <listing version="3.0">
+var progress = myAnimation.totalProgress(); //gets total progress
+myAnimation.totalProgress(0.25); //sets total progress to one quarter finished
+		 </listing>
+		 * 
+		 * @param value Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * @param suppressEvents If <code>true</code>, no events or callbacks will be triggered when the playhead moves to the new position.
+		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
+		 * 
+		 * @see #progress()
+		 * @see #seek()
+		 * @see #time()
+		 * @see #totalTime()
+		 **/
+		public function totalProgress(value:Number=NaN, suppressEvents:Boolean=false):* {
+			return (!arguments.length) ? _time / duration() : totalTime(duration() * value, suppressEvents);
 		}
 		
 		/** 
@@ -992,7 +1081,7 @@ myAnimation.reversed( !myAnimation.reversed() ); //toggles the orientation
 				_pauseTime = value ? raw : NaN;
 				_paused = value;
 				_active = (!value && _totalTime > 0 && _totalTime < _totalDuration);
-				if (!value && elapsed != 0 && _duration !== 0) {
+				if (!value && elapsed != 0 && _initted && duration() !== 0) {
 					render((_timeline.smoothChildTiming ? _totalTime : (raw - _startTime) / _timeScale), true, true); //in case the target's properties changed via some other tween or manual update by the user, we should force a render.
 				}
 			}

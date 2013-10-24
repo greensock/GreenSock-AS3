@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.16
- * DATE: 2013-09-10
+ * VERSION: 12.1.0
+ * DATE: 2013-10-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -238,7 +238,7 @@ tl.to(mc, 1, {x:100}).to(mc, 1, {y:50}).to(mc, 1, {alpha:0});
  * 	
  * 	</ul>
  * 
- * @example Sample code:<listing version="3.0">
+ * <strong>Sample code:</strong><listing version="3.0">
 //create the timeline with an onComplete callback that calls myFunction() when the timeline completes
 var tl = new TimelineLite({onComplete:myFunction});
 
@@ -269,7 +269,7 @@ nested.to(mc2, 1, {x:200}));
 tl.add(nested);
 </listing>
  * 
- * <strong>How do timelines work? What are the mechanics like?</strong>
+ * <p><strong>How do timelines work? What are the mechanics like?</strong></p>
  * <p>Every animation (tween and timeline) is placed on a parent timeline (except the 2 root timelines - there's one for normal tweens and another for "useFrames" ones). 
  * In a sense, they all have their own playheads (that's what its "time" refers to, or "totalTime" which is identical except that it includes repeats and repeatDelays) 
  * but generally they're not independent because they're sitting on a timeline whose playhead moves. 
@@ -303,7 +303,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.0.16";
+		public static const version:String = "12.1.0";
 		
 		/** @private **/
 		protected var _labels:Object;
@@ -1135,6 +1135,7 @@ TweenLite.fromTo(myWindow, 1, {scaleX:0, scaleY:0}, {scaleX:1, scaleY:1});
 		
 		
 		/**
+		 * @private
 		 * <strong>[Deprecated in favor of add()]</strong>
 		 * Inserts a tween, timeline, callback, or label into the timeline at a specific time, frame, 
 		 * or label. This gives you complete control over the insertion point (<code>append()</code>
@@ -1298,6 +1299,7 @@ tl.add([tween1, tween2, tween3], "+=2", "sequence", 0.5);
 		}
 		
 		/**
+		 * @private
 		 * <strong>[Deprecated in favor of add()]</strong>
 		 * Appends a tween, timeline, callback, or label to the <strong>end</strong> of the timeline,
 		 * optionally offsetting its insertion point by a certain amount (to make it overlap with the end of 
@@ -1349,6 +1351,7 @@ myTimeline.append(nested);
 		}
 		
 		/**
+		 * @private
 		 * <strong>[Deprecated in favor of add()]</strong>
 		 * Inserts multiple tweens/timelines/callbacks/labels into the timeline at once, optionally aligning them 
 		 * (as a sequence for example) and/or staggering the timing. You can use the <code>insert()</code> method
@@ -1369,6 +1372,7 @@ myTimeline.append(nested);
 		}
 		
 		/**
+		 * @private
 		 * <strong>[Deprecated in favor of add()]</strong>
 		 * Appends multiple tweens/timelines/callbacks/labels to the end of the timeline at once, optionally 
 		 * offsetting the insertion point by a certain amount, aligning them (as a sequence for example), and/or 
@@ -1544,30 +1548,30 @@ myAnimation.seek("myLabel");
 				if (!_reversed) if (!_hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (_duration == 0) if (time == 0 || _rawPrevTime < 0) if (_rawPrevTime != time && _first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+					if (_duration === 0) if (time === 0 || _rawPrevTime < 0 || _rawPrevTime === _tinyNum) if (_rawPrevTime !== time && _first != null) {
 						internalForce = true;
-						if (_rawPrevTime > 0) {
+						if (_rawPrevTime > _tinyNum) {
 							callback = "onReverseComplete";
 						}
 					}
 				}
-				_rawPrevTime = time;
+				_rawPrevTime = (_duration !== 0 || !suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 				time = totalDur + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				_totalTime = _time = 0;
-				if (prevTime != 0 || (_duration == 0 && _rawPrevTime > 0)) {
+				if (prevTime != 0 || (_duration == 0 && (_rawPrevTime > _tinyNum || (time < 0 && _rawPrevTime >= 0)))) {
 					callback = "onReverseComplete";
 					isComplete = _reversed;
 				}
 				if (time < 0) {
 					_active = false;
-					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+					if (_duration == 0) if (_rawPrevTime >= 0 && _first != null) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
 					_rawPrevTime = time;
 				} else {
-					_rawPrevTime = time;
+					_rawPrevTime = (_duration || !suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
 					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 					if (!_initted) {
 						internalForce = true;
@@ -1821,30 +1825,7 @@ myAnimation.seek("myLabel");
 		
 		
 //---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
-				
-		/** 
-		 * Gets or sets the animation's progress which is a value between 0 and 1 indicating the position 
-		 * of the virtual playhead where 0 is at the beginning, 0.5 is halfway complete, and 1 is complete. 
-		 * 
-		 * <p>This method serves as both a getter and setter. Omitting the parameter returns the current 
-		 * value (getter), whereas defining the parameter sets the value (setter) and returns the instance 
-		 * itself for easier chaining, like <code>myAnimation.progress(0.5).play();</code></p>
-		 * 
-		 * <listing version="3.0">
- var progress = myAnimation.progress(); //gets current progress
- myAnimation.progress( 0.25 ); //sets progress to one quarter finished
-		 </listing>
-		 * 
-		 * @param value Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
-		 * @return Omitting the parameter returns the current value (getter), whereas defining the parameter sets the value (setter) and returns the instance itself for easier chaining.
-		 * 
-		 * @see #seek()
-		 * @see #time()
-		 * @see #totalTime()
-		 **/
-		public function progress(value:Number=NaN):* {
-			return (!arguments.length) ? _time / duration() : totalTime(duration() * value, false);
-		}
+		
 		
 		/**
 		 * Gets the timeline's <code>duration</code> or, if used as a setter, adjusts the timeline's 
