@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.935
- * DATE: 2013-03-18
+ * VERSION: 1.936
+ * DATE: 2013-10-28
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -174,7 +174,7 @@ package com.greensock.loading.core {
 			if (this.vars.alternateURL != undefined && this.vars.alternateURL != "" && !_skipAlternateURL) { //don't do (_url != vars.alternateURL) because the audit could have changed it already - that's the whole purpose of _skipAlternateURL.
 				_errorHandler(event);
 				_skipAlternateURL = true;
-				_url = "temp" + Math.random(); //in case the audit already changed the _url to vars.alternateURL, we temporarily make it something different in order to force the refresh in the url setter which skips running the code if the url is set to the same value as it previously was. 
+				_url = "temp" + (new Date().getTime()); //in case the audit already changed the _url to vars.alternateURL, we temporarily make it something different in order to force the refresh in the url setter which skips running the code if the url is set to the same value as it previously was. Don't use Math.random() because for some reason, Google Display Network disallows it (citing security reasons).
 				this.url = this.vars.alternateURL; //also calls _load()
 			} else {
 				super._failHandler(event, dispatchError);
