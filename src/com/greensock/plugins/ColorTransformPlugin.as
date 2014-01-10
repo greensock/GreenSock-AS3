@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0
- * DATE: 2013-10-11
+ * VERSION: 12.1.3
+ * DATE: 2013-12-12
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -81,21 +81,21 @@ TweenLite.to(mc, 1, {colorTransform:{tint:0xFF0000, tintAmount:0.5}});
 					end[p] = value[p];
 				}
 			}
-			
-			if (!isNaN(value.tintAmount)) {
-				var ratio:Number = value.tintAmount / (1 - ((end.redMultiplier + end.greenMultiplier + end.blueMultiplier) / 3));
-				end.redOffset *= ratio;
-				end.greenOffset *= ratio;
-				end.blueOffset *= ratio;
-				end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1 - value.tintAmount;
-			} else if (!isNaN(value.exposure)) {
-				end.redOffset = end.greenOffset = end.blueOffset = 255 * (value.exposure - 1);
-				end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1;
-			} else if (!isNaN(value.brightness)) {
-				end.redOffset = end.greenOffset = end.blueOffset = Math.max(0, (value.brightness - 1) * 255);
-				end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1 - Math.abs(value.brightness - 1);
+			if (!(value is ColorTransform)) {
+				if (!isNaN(value.tintAmount)) {
+					var ratio:Number = value.tintAmount / (1 - ((end.redMultiplier + end.greenMultiplier + end.blueMultiplier) / 3));
+					end.redOffset *= ratio;
+					end.greenOffset *= ratio;
+					end.blueOffset *= ratio;
+					end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1 - value.tintAmount;
+				} else if (!isNaN(value.exposure)) {
+					end.redOffset = end.greenOffset = end.blueOffset = 255 * (value.exposure - 1);
+					end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1;
+				} else if (!isNaN(value.brightness)) {
+					end.redOffset = end.greenOffset = end.blueOffset = Math.max(0, (value.brightness - 1) * 255);
+					end.redMultiplier = end.greenMultiplier = end.blueMultiplier = 1 - Math.abs(value.brightness - 1);
+				}
 			}
-			
 			_init(start, end);
 			return true;
 		}

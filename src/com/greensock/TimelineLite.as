@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.1.0
- * DATE: 2013-10-21
+ * VERSION: 12.1.2
+ * DATE: 2013-12-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinelite/
  **/
@@ -303,7 +303,7 @@ tl.add(nested);
  **/
 	public class TimelineLite extends SimpleTimeline {
 		/** @private **/
-		public static const version:String = "12.1.0";
+		public static const version:String = "12.1.2";
 		
 		/** @private **/
 		protected var _labels:Object;
@@ -725,7 +725,7 @@ tl.staggerTo(myArray, 1, {x:100}, 0.25, "myLabel+=2");  //places 2 seconds after
 		 * @see #staggerFromTo()
 		 */
 		public function staggerTo(targets:Array, duration:Number, vars:Object, stagger:Number, position:*="+=0", onCompleteAll:Function=null, onCompleteAllParams:Array=null):* {
-			var tl:TimelineLite = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams});
+			var tl:TimelineLite = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, smoothChildTiming:this.smoothChildTiming});
 			for (var i:int = 0; i < targets.length; i++) {
 				if (vars.startAt != null) {
 					vars.startAt = _copy(vars.startAt);
@@ -1556,7 +1556,7 @@ myAnimation.seek("myLabel");
 					}
 				}
 				_rawPrevTime = (_duration !== 0 || !suppressEvents || time !== 0) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-				time = totalDur + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = totalDur + 0.0001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
 				
 			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0. 
 				_totalTime = _time = 0;

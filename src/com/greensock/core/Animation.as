@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.1.0
- * DATE: 2013-10-21
+ * VERSION: 12.1.1
+ * DATE: 2013-12-07
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -47,7 +47,7 @@ tl.add( animateOut(), 3);
  */
 	public class Animation {
 		/** @private **/
-		public static const version:String = "12.1.0";
+		public static const version:String = "12.1.1";
 		
 		/**
 		 * The object that dispatches a <code>"tick"</code> event each time the engine updates, making it easy for 
@@ -1029,7 +1029,7 @@ myAnimation.reversed( !myAnimation.reversed() ); //toggles the orientation
 			}
 			if (value != _reversed) {
 				_reversed = value;
-				totalTime(_totalTime, true);
+				totalTime(((_timeline && !_timeline.smoothChildTiming) ? totalDuration() - _totalTime : _totalTime), true);
 			}
 			return this;
 		}

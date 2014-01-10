@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.1.1
- * DATE: 2013-10-29
+ * VERSION: 12.1.2
+ * DATE: 2013-12-21
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -304,7 +304,7 @@ package com.greensock {
 	public class TweenLite extends Animation {
 		
 		/** @private **/
-		public static const version:String = "12.1.1";
+		public static const version:String = "12.1.2";
 		
 		/** Provides An easy way to change the default easing equation. Choose from any of the GreenSock eases in the <code>com.greensock.easing</code> package. @default Power1.easeOut **/
 		public static var defaultEase:Ease = new Ease(null, null, 1, 1);
@@ -739,7 +739,7 @@ package com.greensock {
 				if (time < 0 && _startAt != null && _startTime != 0) { //if the tween is positioned at the VERY beginning (_startTime 0) of its parent timeline, it's illegal for the playhead to go back further, so we should not render the recorded startAt values.
 					_startAt.render(time, suppressEvents, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
 				}
-				if (!suppressEvents) {
+				if (!suppressEvents) if (_time !== prevTime || isComplete) {
 					_onUpdate.apply(null, vars.onUpdateParams);
 				}
 			}
@@ -1297,7 +1297,7 @@ var a2 = TweenLite.getTweensOf([myObject1, myObject2]); //finds 3 tweens
 					if (_checkOverlap(curTween, globalStart, zeroDur) === 0) {
 						overlaps[oCount++] = curTween;
 					}
-				} else if (curTween._startTime <= startTime) if (curTween._startTime + curTween.totalDuration() / curTween._timeScale + 0.0000000001 > startTime) if (!((zeroDur || !curTween._initted) && startTime - curTween._startTime <= 0.0000000002)) {
+				} else if (curTween._startTime <= startTime) if (curTween._startTime + curTween.totalDuration() / curTween._timeScale > startTime) if (!((zeroDur || !curTween._initted) && startTime - curTween._startTime <= 0.0000000002)) {
 					overlaps[oCount++] = curTween;
 				}
 			}
