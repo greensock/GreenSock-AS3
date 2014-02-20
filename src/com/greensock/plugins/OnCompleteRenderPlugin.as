@@ -25,7 +25,7 @@ TweenPlugin.activate([OnCompleteRenderPlugin]); //activation is permanent in the
 TweenLite.to(mc, 1, {x:100, onCompleteRender:myFunc});  //tweens horizontal and vertical scale simultaneously
 </listing>
  * 
- * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2014, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */
@@ -66,7 +66,7 @@ TweenLite.to(mc, 1, {x:100, onCompleteRender:myFunc});  //tweens horizontal and 
 		
 		/** @private **/
 		override public function setRatio(v:Number):void {
-			if (v == 1 || v == 0) if (_func != null) if (_tween._time == _tween._duration) { //if _func is null, this plugin was used to init the onCompleteRenderParams, so just ignore it (we'll reference it in the onCompleteRender instance instead).
+			if (v == 1 || v == 0) if (_func != null) if (_tween._time == _tween._duration && _tween.data != "isFromStart") { //if _func is null, this plugin was used to init the onCompleteRenderParams, so just ignore it (we'll reference it in the onCompleteRender instance instead).
 				_target.addEventListener("enterFrame", _enterFrameHandler, false, 100, true);
 			}
 		}

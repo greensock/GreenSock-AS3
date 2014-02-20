@@ -1,6 +1,6 @@
 /**
- * VERSION: 0.4 (beta)
- * DATE: 2010-12-22
+ * VERSION: 0.4.1 (beta)
+ * DATE: 2013-03-11
  * AS3
  * UPDATES AND DOCS AT: http://www.GreenSock.com
  **/
@@ -64,7 +64,7 @@ TweenLite.to(follower, 2, {progress:circle.followerTween(follower, 200, Directio
  * 			property which will provide better performance than tweening each follower independently.</li>
  * </ul>
  * 
- * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2010-2014, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */	
@@ -221,7 +221,7 @@ TweenLite.to(follower, 2, {progress:circle.followerTween(follower, 200, Directio
 					dif = (dif < 0) ? dif + revolution : dif - revolution;
 				}
 			}
-			if (dif < 0) {
+			if (dif < 0 || (dif == 0 && direction == "counterClockwise")) {
 				dif -= extraRevolutions * revolution;
 			} else {
 				dif += extraRevolutions * revolution;

@@ -29,7 +29,7 @@ TweenPlugin.activate([CacheAsBitmapPlugin]); //activation is permanent in the SW
 TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true}); 
 </listing>
  * 
- * <p><strong>Copyright 2008-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2008-2014, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  */
@@ -62,7 +62,7 @@ TweenLite.to(mc, 1, {x:100, cacheAsBitmap:true});
 		
 		/** @private **/
 		override public function setRatio(v:Number):void {
-			if ((v == 1 && _tween._duration == _tween._time) || (v == 0 && _tween._time == 0)) { //a changeFactor of 1 doesn't necessarily mean the tween is done - if the ease is Elastic.easeOut or Back.easeOut for example, they could hit 1 mid-tween. 
+			if ((v == 1 && _tween._duration == _tween._time && _tween.data != "isFromStart") || (v == 0 && _tween._time == 0)) { //a changeFactor of 1 doesn't necessarily mean the tween is done - if the ease is Elastic.easeOut or Back.easeOut for example, they could hit 1 mid-tween. 
 				_target.cacheAsBitmap = _initVal;
 			} else if (_target.cacheAsBitmap != _cacheAsBitmap) {
 				_target.cacheAsBitmap = _cacheAsBitmap;

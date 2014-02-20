@@ -1,6 +1,6 @@
 /**
  * VERSION: 1.0
- * DATE: 2012-03-22
+ * DATE: 2013-03-13
  * AS3 (AS2 and JS versions are also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -19,7 +19,7 @@ package com.greensock.easing {
  * TweenLite.to(obj, 1, {x:100, ease:Power0.easeOut});
  * </code></p>
  * 
- * <p><strong>Copyright 2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2014, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @author Jack Doyle, jack@greensock.com
  **/
@@ -33,5 +33,8 @@ package com.greensock.easing {
 		
 		/** eases in and then out with a power of 0 (linear). Power0.easeIn, Power0.easeOut, and Power0.easeInOut are all identical because there is no power - they're all linear but use the common naming convention for ease of use.  **/
 		public static var easeInOut:Ease = new Ease(null,null,3,0);
+		
+		/** Eases out with a power of 0 (linear). Power0.easeNone, Power0.easeIn, Power0.easeOut, and Power0.easeInOut are all identical because there is no power - they're all linear but use the common naming convention for ease of use. **/
+		public static var easeNone:Ease = new Ease(null,null,1,0);
 	}
 }

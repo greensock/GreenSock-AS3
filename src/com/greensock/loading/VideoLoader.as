@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.937
- * DATE: 2013-07-10
+ * VERSION: 1.938
+ * DATE: 2013-07-16
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -187,7 +187,7 @@ function errorHandler(event:LoaderEvent):void {
 }
  </listing>
  * 
- * <p><strong>Copyright 2010-2013, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
+ * <p><strong>Copyright 2010-2014, GreenSock. All rights reserved.</strong> This work is subject to the terms in <a href="http://www.greensock.com/terms_of_use.html">http://www.greensock.com/terms_of_use.html</a> or for <a href="http://www.greensock.com/club/">Club GreenSock</a> members, the software agreement that was issued with the membership.</p>
  * 
  * @see com.greensock.loading.data.VideoLoaderVars
  * 
@@ -701,6 +701,28 @@ function cuePointHandler(event:LoaderEvent):void {
 		 **/
 		public function playVideo(event:Event=null):void {
 			this.videoPaused = false;
+		}
+		
+		/**
+		 * Sets or gets the current repeat count (how many times the video has repeated, as determined
+		 * by the <code>"repeat"</code> special property that was passed into the constructor). If you pass 
+		 * a value to the function, it acts as a setter, and if you omit the parameter, it acts as a getter
+		 * and returns the current value. For example, if the video was set to repeat 5 times and it is currently
+		 * in the middle of its 3rd time playing, <code>repeatCount()</code> will return 2 because it has already 
+		 * finished playing twice completely. 
+		 * 
+		 * @param value the value that should be assigned to the current repeat count (or if you omit this parameter, the current repeat count will be returned)
+		 * @return If the <code>value</code> parameter is omitted, it will return the current repeat count (how many times it has completely played and looped back to the beginning). If the function is used as a setter, the VideoLoader instance itself is returned in order to make chaining easier. 
+		 */
+		public function repeatCount(value:int=0):* {
+			if (!arguments.length) {
+				return _repeatCount;
+			}
+			if (value < int(this.vars.repeat)) {
+				_videoComplete = false;
+			}
+			_repeatCount = value;
+			return this;
 		}
 		
 		/** 
