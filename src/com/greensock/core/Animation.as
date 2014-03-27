@@ -245,7 +245,7 @@ myAnimation.play(2, false);
 		 * @return self (makes chaining easier)
 		 */
 		public function play(from:*=null, suppressEvents:Boolean=true):* {
-			if (arguments.length) {
+			if (from != null) {
 				seek(from, suppressEvents);
 			}
 			reversed(false);
@@ -279,7 +279,7 @@ myAnimation.play(2, false);
 		 * @return self (makes chaining easier)
 		 */
 		public function pause(atTime:*=null, suppressEvents:Boolean=true):* {
-			if (arguments.length) {
+			if (atTime != null) {
 				seek(atTime, suppressEvents);
 			}
 			return paused(true);
@@ -312,7 +312,7 @@ myAnimation.play(2, false);
 		 * @return self (makes chaining easier)
 		 */
 		public function resume(from:*=null, suppressEvents:Boolean=true):* {
-			if (arguments.length) {
+			if (from != null) {
 				seek(from, suppressEvents);
 			}
 			return paused(false);
@@ -418,7 +418,7 @@ myAnimation.play(2, false);
 		 * @return self (makes chaining easier)
 		 */
 		public function reverse(from:*=null, suppressEvents:Boolean=true):* {
-			if (arguments.length) {
+			if (from != null) {
 				seek((from || totalDuration()), suppressEvents);
 			}
 			reversed(true);

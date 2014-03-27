@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.13
- * DATE: 2013-03-25
+ * VERSION: 12.14
+ * DATE: 2014-03-12
  * AS3 (AS2 and JavaScript versions also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -187,6 +187,10 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 		protected var _prec:Number; //precision
 		/** @private **/
 		protected var _timeRes:int;
+		/** @private we need to store the initial rotation for autoRotate tweens so that if/when the tween is rewound completely, the original value gets re-applied. **/
+		protected var _initialRotations:Array;
+		/** @private we determine the starting ratio when the tween inits which is always 0 unless the tween has runBackwards:true (which indicates it's a from() tween) in which case it's 1. **/
+		protected var _startRatio:int;
 		
 		
 		/** @private **/
@@ -245,6 +249,7 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 			}
 			
 			if ((ar = this._autoRotate)) {
+				this._initialRotations = [];
 				if (!(ar[0] is Array)) {
 					this._autoRotate = ar = [ar];
 				}
@@ -254,8 +259,11 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 						p = ar[i][j];
 						this._func[p] = (target[p] is Function) ? target[ ((p.indexOf("set") || !("get" + p.substr(3) in target)) ? p : "get" + p.substr(3)) ] : false;
 					}
+					p = ar[i][2];
+					this._initialRotations[i] = this._func[p] ? this._func[p]() : this._target[p];
 				}
 			}
+			_startRatio = tween.vars.runBackwards ? 1 : 0;
 			return true;
 		}
 		
@@ -735,6 +743,7 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 			var segments:int = this._segCount,
 				func:Object = this._func,
 				target:Object = this._target,
+				notStart:Boolean = (v !== this._startRatio),
 				curIndex:int, inv:Number, i:int, p:String, b:Segment, t:Number, val:Number, l:int, lengths:Array, curSeg:Array;
 			if (this._timeRes == 0) {
 				curIndex = (v < 0) ? 0 : (v >= 1) ? segments - 1 : (segments * v) >> 0;
@@ -824,7 +833,7 @@ TweenMax.to(obj, 5, {bezier:{type:"cubic", values:[{x:100, y:250}, {x:150, y:100
 					y1 += (y2 - y1) * t;
 					y2 += ((b2.c + (b2.d - b2.c) * t) - y2) * t;
 					
-					val = Math.atan2(y2 - y1, x2 - x1) * conv + add;
+					val = notStart ? Math.atan2(y2 - y1, x2 - x1) * conv + add : this._initialRotations[i];
 					
 					if (func[p]) {
 						target[p](val);
