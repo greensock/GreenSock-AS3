@@ -1,6 +1,6 @@
 ﻿/**
- * VERSION: 12.0.3
- * DATE: 2013-02-28
+ * VERSION: 12.0.4
+ * DATE: 2014-07-08
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -135,7 +135,6 @@ package com.greensock.core {
 				if (!skipDisable) {
 					tween._enabled(false, true);
 				}
-				tween.timeline = null;
 				
 				if (tween._prev) {
 					tween._prev._next = tween._next;
@@ -147,6 +146,7 @@ package com.greensock.core {
 				} else if (_last === tween) {
 					_last = tween._prev;
 				}
+				tween._next = tween._prev = tween.timeline = null;
 				
 				if (_timeline) {
 					_uncache(true);

@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.1.4
- * DATE: 2014-03-21
+ * VERSION: 12.1.5
+ * DATE: 2014-07-19
  * AS3 (AS2 version is also available)
  * UPDATES AND DOCS AT: http://www.greensock.com/timelinemax/
  **/
@@ -388,7 +388,7 @@ tl.add(nested);
  **/
 	public class TimelineMax extends TimelineLite implements IEventDispatcher {
 		/** @private **/
-		public static const version:String = "12.1.4";
+		public static const version:String = "12.1.5";
 		/** @private **/
 		protected static var _listenerLookup:Object = {onCompleteListener:TweenEvent.COMPLETE, onUpdateListener:TweenEvent.UPDATE, onStartListener:TweenEvent.START, onRepeatListener:TweenEvent.REPEAT, onReverseCompleteListener:TweenEvent.REVERSE_COMPLETE};
 		/** @private **/
@@ -734,7 +734,7 @@ tl.add(nested);
 		 */
 		public function tweenTo(position:*, vars:Object=null):TweenLite {
 			vars = vars || {};
-			var copy:Object = {ease:_easeNone, overwrite:2, useFrames:usesFrames(), immediateRender:false};
+			var copy:Object = {ease:_easeNone, overwrite:(vars.delay ? 2 : 1), useFrames:usesFrames(), immediateRender:false};
 			for (var p:String in vars) {
 				copy[p] = vars[p];
 			}
@@ -858,7 +858,7 @@ tl.add( myTimeline.tweenFromTo("myLabel2", 0) );
 				}
 				if (time < 0) {
 					_active = false;
-					if (_duration == 0) if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+					if (_rawPrevTime >= 0 && _first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
 						internalForce = true;
 					}
 					_rawPrevTime = time;			

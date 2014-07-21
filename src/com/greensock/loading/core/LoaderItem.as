@@ -1,6 +1,6 @@
 /**
- * VERSION: 1.936
- * DATE: 2013-10-28
+ * VERSION: 1.937
+ * DATE: 2014-06-26
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com/loadermax/
  **/
@@ -29,6 +29,8 @@ package com.greensock.loading.core {
 	public class LoaderItem extends LoaderCore {
 		/** @private **/
 		protected static var _cacheID:Number = new Date().getTime();
+		/** @private **/
+		protected static var _underlineExp:RegExp = /%5f/gi;
 		
 		/** @private **/
 		protected var _url:String;
@@ -92,7 +94,7 @@ package com.greensock.loading.core {
 					pair = a[i].split("=");
 					data[pair.shift()] = pair.join("=");
 				}
-				request.data = data;
+				request.data = data.toString().replace(_underlineExp, "_");
 			}
 			if (_isLocal && this.vars.allowMalformedURL != true && _request.data != null && _request.url.substr(0, 4) != "http") {
 				_request.method = "POST"; //to avoid errors when loading local files with GET URL parameters
