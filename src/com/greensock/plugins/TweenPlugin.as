@@ -1,6 +1,6 @@
 /**
- * VERSION: 12.0.13
- * DATE: 2013-07-10
+ * VERSION: 12.1.5
+ * DATE: 2013-07-21
  * AS3
  * UPDATES AND DOCS AT: http://www.greensock.com
  **/
@@ -88,7 +88,7 @@ package com.greensock.plugins {
  */
 	public class TweenPlugin {
 		/** @private **/
-		public static const version:String = "12.0.13";
+		public static const version:String = "12.1.5";
 		
 		/** @private If the API/Framework for plugins changes in the future, this number helps determine compatibility **/
 		public static const API:Number = 2; 
@@ -154,8 +154,8 @@ package com.greensock.plugins {
 		 * @return If a PropTween is created (which means a tween was required between the provided start and end values), that PropTween is returned. Otherwise, null is returned. 
 		 */
 		protected function _addTween(target:Object, propName:String, start:Number, end:*, overwriteProp:String=null, round:Boolean=false):PropTween {
-			var c:Number;
-			if (end != null && (c = (typeof(end) === "number" || end.charAt(1) !== "=") ? Number(end) - start : int(end.charAt(0)+"1") * Number(end.substr(2)))) {
+			var c:Number = (end == null) ? 0 : (typeof(end) === "number" || end.charAt(1) !== "=") ? Number(end) - start : int(end.charAt(0) + "1") * Number(end.substr(2));
+			if (c !== 0) {
 				_firstPT = new PropTween(target, propName, start, c, overwriteProp || propName, false, _firstPT);
 				_firstPT.r = round;
 				return _firstPT;
